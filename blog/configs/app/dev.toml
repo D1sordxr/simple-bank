@@ -1,0 +1,17 @@
+[app]
+mode='development'
+
+[api]
+host = "localhost"
+port = 8888
+base_url_prefix = "/api/v1"
+
+[db]
+host = "localhost"
+port = 5432
+database = "BlogApp"
+user = "postgres"
+password = "1234"
+migration = true
+logging = true
+max_idle_connection = 100

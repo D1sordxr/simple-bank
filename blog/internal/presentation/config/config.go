@@ -5,5 +5,6 @@ type AppConfig struct {
 }
 
 type Config struct {
-	AppConfig `toml:"app"`
+	AppConfig     `toml:"app"`
+	api.APIConfig `toml:"api"`
 }
