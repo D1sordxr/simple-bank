@@ -1,3 +1,3 @@
 ﻿# LearningArch
 
-trying to build go clean architecture app
+learning to build go clean architecture app
