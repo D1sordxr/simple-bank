@@ -1,9 +1,13 @@
 package main
 
-import "go.uber.org/fx"
+import (
+	"LearningArch/blog/internal/presentation/di/config"
+	"go.uber.org/fx"
+)
 
 func main() {
-	fx.New().Run()
+	fx.New(
+		config.Module,
+	).Run()
 
-	// TODO: init logger
 }

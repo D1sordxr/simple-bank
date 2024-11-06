@@ -15,3 +15,7 @@ password = "1234"
 migration = true
 logging = true
 max_idle_connection = 100
+
+[logger]
+log_output=''
+log_level='info'

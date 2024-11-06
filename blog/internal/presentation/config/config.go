@@ -1,8 +1,9 @@
 package config
 
 import (
+	api "LearningArch/blog/internal/infrastructure/api/config"
 	db "LearningArch/blog/internal/infrastructure/db/config"
-	api "LearningArch/blog/internal/presentation/api/config"
+	logger "LearningArch/blog/internal/infrastructure/logger/config"
 )
 
 type AppConfig struct {
@@ -10,7 +11,8 @@ type AppConfig struct {
 }
 
 type Config struct {
-	AppConfig     `toml:"app"`
-	api.APIConfig `toml:"api"`
-	db.DBConfig   `toml:"db"`
+	AppConfig           `toml:"app"`
+	api.APIConfig       `toml:"api"`
+	db.DBConfig         `toml:"db"`
+	logger.LoggerConfig `toml:"logger"`
 }
