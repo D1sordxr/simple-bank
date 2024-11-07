@@ -18,7 +18,9 @@ func BuildConnection(config config.Config) *gorm.DB {
 		panic(err.Error())
 	}
 
-	// TODO: if config.Migration { migrate(db) }
+	if config.Migration {
+		migrate(db)
+	}
 
 	return db
 }
