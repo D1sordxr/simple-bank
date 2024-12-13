@@ -12,6 +12,10 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 		LastName:   "Potapov",
 		MiddleName: "Igorevich",
 		Email:      "testing@mail.now",
+		Phones: []map[string]int{
+			{"country": 7, "code": 982, "number": 8823979},
+			{"country": 1, "code": 555, "number": 1234567},
+		},
 	}
 
 	ctx := context.Background()
@@ -19,9 +23,19 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 	createClient := NewCreateClientHandler()
 	response, err := createClient.Handle(ctx, command)
 	if err != nil {
-		t.Log("test failed")
+		t.Errorf("expected no error, got %v", err)
 		return
 	}
-	t.Logf("%s", response.FullName)
-	t.Logf("%s", response.Email)
+
+	expectedFullName := "Oleg Potapov Igorevich"
+	if response.FullName != expectedFullName {
+		t.Errorf("expected full name %q, got %q", expectedFullName, response.FullName)
+	}
+
+	expectedEmail := "testing@mail.now"
+	if response.Email != expectedEmail {
+		t.Errorf("expected email %q, got %q", expectedEmail, response.Email)
+	}
+
+	t.Logf("Name: %s,\nEmail: %s,\nPhones: %s", response.FullName, response.Email, response.Phones)
 }
