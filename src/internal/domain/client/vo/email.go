@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"LearningArch/internal/domain/client/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/exceptions"
 	"net/mail"
 	"unicode/utf8"
 )

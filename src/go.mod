@@ -1,4 +1,4 @@
-module LearningArch
+module github.com/D1sordxr/simple-banking-system
 
 go 1.23rc2
 

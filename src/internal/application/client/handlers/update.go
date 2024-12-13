@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"LearningArch/internal/application/client/commands"
 	"context"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
 )
 
 type UpdateClientHandler struct {

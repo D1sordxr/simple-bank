@@ -1,8 +1,8 @@
 package client
 
 import (
-	"LearningArch/internal/domain/client/entity"
-	"LearningArch/internal/domain/client/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 	"github.com/google/uuid"
 )
 

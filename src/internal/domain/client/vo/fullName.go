@@ -1,8 +1,8 @@
 package vo
 
 import (
-	"LearningArch/internal/domain/client/exceptions"
 	"fmt"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/exceptions"
 	"regexp"
 )
 

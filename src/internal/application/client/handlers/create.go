@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"LearningArch/internal/application/client/commands"
-	"LearningArch/internal/domain/client/entity"
-	"LearningArch/internal/domain/client/vo"
 	"context"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 )
 
 type CreateClientHandler struct {
