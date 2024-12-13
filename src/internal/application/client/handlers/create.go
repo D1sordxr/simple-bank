@@ -27,10 +27,12 @@ func (h *CreateClientHandler) Handle(_ context.Context, c commands.CreateClientC
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
+	status := vo.NewStatus()
 
 	return commands.CreateDTO{
 		FullName: fullName.String(),
 		Email:    email.String(),
 		Phones:   phones.Read(),
+		Status:   status.String(),
 	}, nil
 }

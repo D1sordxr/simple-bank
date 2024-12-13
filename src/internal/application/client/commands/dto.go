@@ -7,5 +7,6 @@ type CreateDTO struct {
 	FullName string   `json:"full_name"`
 	Email    string   `json:"email"`
 	Phones   []string `json:"phones"`
+	Status   string   `json:"status"`
 	// Testing
 }

@@ -37,5 +37,10 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 		t.Errorf("expected email %q, got %q", expectedEmail, response.Email)
 	}
 
-	t.Logf("Name: %s,\nEmail: %s,\nPhones: %s", response.FullName, response.Email, response.Phones)
+	t.Logf("\n"+
+		"Name: %s,\n"+
+		"Email: %s,\n"+
+		"Phones: %s\n"+
+		"Status: %s\n",
+		response.FullName, response.Email, response.Phones, response.Status)
 }
