@@ -17,7 +17,11 @@ func NewEmail(email string) (Email, error) {
 
 	address, err := mail.ParseAddress(email)
 	if err != nil {
-		return Email{}, err
+		return Email{}, exceptions.InvalidEmailFormat
 	}
 	return Email{Email: address.Address}, nil
+}
+
+func (e *Email) String() string {
+	return e.Email
 }
