@@ -37,7 +37,7 @@ func (p Phones) Read() []string {
 	phones := make([]string, 0, len(p))
 
 	for _, data := range p {
-		phone := fmt.Sprintf("+%v (%v) %v", data.Country, data.Code, data.Number)
+		phone := fmt.Sprintf("+%v(%v)%v", data.Country, data.Code, data.Number)
 		phones = append(phones, phone)
 	}
 
