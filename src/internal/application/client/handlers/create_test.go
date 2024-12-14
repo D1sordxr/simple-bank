@@ -22,8 +22,8 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 
 	ctx := context.Background()
 	mockRepo := new(mocks.MockRepository)
-	mockRepo.On("Exists", mock.Anything).Return(nil)
-	mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockRepo.On("Exists", mock.Anything, mock.Anything).Return(nil)
+	mockRepo.On("Create", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	createClient := NewCreateClientHandler(mockRepo, &mocks.TestUoWManager{})
 	response, err := createClient.Handle(ctx, command)
