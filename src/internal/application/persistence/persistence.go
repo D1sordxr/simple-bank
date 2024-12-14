@@ -4,12 +4,18 @@ import (
 	"context"
 )
 
-type TransactionService interface {
-	Commit(ctx context.Context) error
-	Rollback(ctx context.Context) error
-	Begin(ctx context.Context) (interface{}, error)
+type UoWManager interface {
+	GetUoW() UnitOfWork
 }
 
-type TransactionManager interface {
-	GetTxManager() TransactionService
+type UnitOfWork interface {
+	Begin(ctx context.Context) (interface{}, error)
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
+
+	// TODO: Clients() ClientRepository
+	// TODO: Accounts() AccountRepository
+	// TODO: Transfers() TransferRepository
+
+	// TODO: PublishEvents(ctx context.Context) error
 }

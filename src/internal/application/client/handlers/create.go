@@ -4,19 +4,27 @@ import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
+	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
+	"github.com/google/uuid"
 )
 
 type CreateClientHandler struct {
-	TxManager persistence.TransactionManager
+	UoWManager persistence.UoWManager
+	Repository clientRoot.Repository
 }
 
-func NewCreateClientHandler() *CreateClientHandler {
-	return &CreateClientHandler{}
+func NewCreateClientHandler(uow persistence.UoWManager,
+	repo clientRoot.Repository) *CreateClientHandler {
+	return &CreateClientHandler{
+		UoWManager: uow,
+		Repository: repo,
+	}
 }
 
-func (h *CreateClientHandler) Handle(_ context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
+func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
+	clientID := uuid.New()
 	fullName, err := vo.NewFullName(c.FirstName, c.MiddleName, c.LastName)
 	if err != nil {
 		return commands.CreateDTO{}, err
@@ -31,10 +39,35 @@ func (h *CreateClientHandler) Handle(_ context.Context, c commands.CreateClientC
 	}
 	status := vo.NewStatus()
 
-	txManager := h.TxManager.GetTxManager()
-	_ = txManager
+	err = h.Repository.Exists(ctx, email.Email)
+	if err != nil {
+		return commands.CreateDTO{}, err
+	}
+
+	client, err := clientRoot.NewClient(clientID, fullName, email, phones, status)
+
+	uow := h.UoWManager.GetUoW()
+	tx, err := uow.Begin(ctx)
+	if err != nil {
+		return commands.CreateDTO{}, err
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			_ = uow.Rollback(ctx)
+			panic(r)
+		}
+		if err != nil {
+			_ = uow.Rollback(ctx)
+		}
+	}()
+
+	err = h.Repository.Create(client, tx)
+	if err != nil {
+		return commands.CreateDTO{}, err
+	}
 
 	return commands.CreateDTO{
+		ClientID: clientID.String(),
 		FullName: fullName.String(),
 		Email:    email.String(),
 		Phones:   phones.Read(),
