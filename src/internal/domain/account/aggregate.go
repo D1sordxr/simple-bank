@@ -4,6 +4,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
 	"github.com/google/uuid"
+	"time"
 )
 
 type Aggregate struct {
@@ -12,8 +13,8 @@ type Aggregate struct {
 	Balance   vo.Balance  // current balance
 	Currency  vo.Currency // account currency (USD, EUR, RUB)
 	Status    vo.Status   // status: active, closed, suspended
-	// TODO: CreatedAt   time.Time
-	// TODO: UpdatedAt   time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func NewAccount(accountID uuid.UUID,
@@ -28,6 +29,7 @@ func NewAccount(accountID uuid.UUID,
 		ClientID:  clientID,
 		Balance:   balance,
 		Currency:  currency,
-		// TODO: Status, CreatedAt, UpdatedAt
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}, nil
 }

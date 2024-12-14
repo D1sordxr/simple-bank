@@ -1,6 +1,8 @@
 package vo
 
-import "errors"
+import (
+	"github.com/D1sordxr/simple-banking-system/internal/domain/account/exceptions"
+)
 
 const (
 	StatusActive    = "active"
@@ -23,7 +25,7 @@ func (s *Status) String() string {
 // SetStatus allows changing the status, ensuring it is valid
 func (s *Status) SetStatus(status string) error {
 	if !isValidStatus(status) {
-		return errors.New("invalid status")
+		return exceptions.InvalidStatus
 	}
 	s.CurrentStatus = status
 	return nil
