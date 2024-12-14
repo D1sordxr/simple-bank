@@ -11,12 +11,12 @@ import (
 )
 
 type CreateClientHandler struct {
-	UoWManager persistence.UoWManager
 	Repository clientRoot.Repository
+	UoWManager persistence.UoWManager
 }
 
-func NewCreateClientHandler(uow persistence.UoWManager,
-	repo clientRoot.Repository) *CreateClientHandler {
+func NewCreateClientHandler(repo clientRoot.Repository,
+	uow persistence.UoWManager) *CreateClientHandler {
 	return &CreateClientHandler{
 		UoWManager: uow,
 		Repository: repo,
@@ -45,6 +45,9 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 
 	client, err := clientRoot.NewClient(clientID, fullName, email, phones, status)
+	if err != nil {
+		return commands.CreateDTO{}, err
+	}
 
 	uow := h.UoWManager.GetUoW()
 	tx, err := uow.Begin(ctx)
@@ -61,8 +64,11 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		}
 	}()
 
-	err = h.Repository.Create(client, tx)
+	err = h.Repository.Create(ctx, tx, client)
 	if err != nil {
+		return commands.CreateDTO{}, err
+	}
+	if err = uow.Commit(ctx); err != nil {
 		return commands.CreateDTO{}, err
 	}
 
