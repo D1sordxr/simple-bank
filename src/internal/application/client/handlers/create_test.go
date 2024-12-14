@@ -21,7 +21,7 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	mockRepo := new(mocks.MockRepository)
+	mockRepo := new(mocks.MockClientRepository)
 	mockRepo.On("Exists", mock.Anything, mock.Anything).Return(nil)
 	mockRepo.On("Create", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 

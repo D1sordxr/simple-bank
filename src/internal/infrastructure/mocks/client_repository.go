@@ -6,21 +6,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockRepository struct {
+type MockClientRepository struct {
 	mock.Mock
 }
 
-func (t *MockRepository) Create(ctx context.Context, tx interface{}, client client.Aggregate) error {
+func (t *MockClientRepository) Create(ctx context.Context, tx interface{}, client client.Aggregate) error {
 	args := t.Called(ctx, tx, client)
 	return args.Error(0)
 }
 
-func (t *MockRepository) Update(ctx context.Context, tx interface{}, client client.Aggregate) error {
+func (t *MockClientRepository) Update(ctx context.Context, tx interface{}, client client.Aggregate) error {
 	args := t.Called(ctx, tx, client)
 	return args.Error(0)
 }
 
-func (t *MockRepository) Load(ctx context.Context, email string) (client.Aggregate, error) {
+func (t *MockClientRepository) Load(ctx context.Context, email string) (client.Aggregate, error) {
 	args := t.Called(ctx, email)
 	user, ok := args.Get(0).(client.Aggregate)
 	if !ok {
@@ -29,7 +29,7 @@ func (t *MockRepository) Load(ctx context.Context, email string) (client.Aggrega
 	return user, args.Error(1)
 }
 
-func (t *MockRepository) Exists(ctx context.Context, email string) error {
+func (t *MockClientRepository) Exists(ctx context.Context, email string) error {
 	args := t.Called(ctx, email)
 	return args.Error(0)
 }
