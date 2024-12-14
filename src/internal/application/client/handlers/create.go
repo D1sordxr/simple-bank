@@ -3,11 +3,13 @@ package handlers
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 )
 
 type CreateClientHandler struct {
+	TxManager persistence.TransactionManager
 }
 
 func NewCreateClientHandler() *CreateClientHandler {
@@ -28,6 +30,9 @@ func (h *CreateClientHandler) Handle(_ context.Context, c commands.CreateClientC
 		return commands.CreateDTO{}, err
 	}
 	status := vo.NewStatus()
+
+	txManager := h.TxManager.GetTxManager()
+	_ = txManager
 
 	return commands.CreateDTO{
 		FullName: fullName.String(),
