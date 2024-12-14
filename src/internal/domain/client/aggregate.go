@@ -2,8 +2,8 @@ package client
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client/exceptions"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
 	"github.com/google/uuid"
 )
 
