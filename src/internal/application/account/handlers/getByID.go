@@ -28,10 +28,17 @@ func (h *GetByIDAccountHandler) Handle(ctx context.Context, c commands.GetByIDAc
 		return commands.GetByIDAccountDTO{}, exceptions.InvalidUUID
 	}
 
-	_ = accountID
-	_ = ctx
+	accountData, err := h.Repository.GetByID(ctx, accountID)
+	if err != nil {
+		return commands.GetByIDAccountDTO{}, err
+	}
 
-	// TODO:
-
-	return commands.GetByIDAccountDTO{}, nil
+	return commands.GetByIDAccountDTO{
+		AvailableMoney: accountData.Balance.AvailableMoney.Value,
+		FrozenMoney:    accountData.Balance.FrozenMoney.Value,
+		Currency:       accountData.Currency.String(),
+		Status:         accountData.Status.String(),
+		CreatedAt:      accountData.CreatedAt.String(),
+		UpdatedAt:      accountData.UpdatedAt.String(),
+	}, nil
 }

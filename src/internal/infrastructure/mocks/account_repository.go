@@ -16,6 +16,15 @@ func (t *MockAccountRepository) Create(ctx context.Context, tx interface{}, acco
 	return args.Error(0)
 }
 
+func (t *MockAccountRepository) GetByID(ctx context.Context, clientID uuid.UUID) (account.Aggregate, error) {
+	args := t.Called(ctx, clientID)
+	accountData, ok := args.Get(0).(account.Aggregate)
+	if !ok {
+		return account.Aggregate{}, args.Error(1)
+	}
+	return accountData, args.Error(1)
+}
+
 func (t *MockAccountRepository) ClientExists(ctx context.Context, clientID uuid.UUID) error {
 	args := t.Called(ctx, clientID)
 	return args.Error(0)
