@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
 )
 
 var validCurrencies = map[string]bool{

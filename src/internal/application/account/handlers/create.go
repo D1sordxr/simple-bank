@@ -7,6 +7,7 @@ import (
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
+	vo2 "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
 	"github.com/google/uuid"
 )
 
@@ -30,7 +31,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 	}
 	accountID := uuid.New()
 	balance := vo.NewBalance()
-	currency, err := vo.NewCurrency(c.Currency)
+	currency, err := vo2.NewCurrency(c.Currency)
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}

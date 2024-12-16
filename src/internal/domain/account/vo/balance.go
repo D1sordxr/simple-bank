@@ -1,48 +1,50 @@
 package vo
 
+import "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+
 type Balance struct {
-	AvailableMoney Money
-	FrozenMoney    Money
+	AvailableMoney vo.Money
+	FrozenMoney    vo.Money
 }
 
 func NewBalance() Balance {
 	return Balance{
-		AvailableMoney: NewMoney(),
-		FrozenMoney:    NewMoney(),
+		AvailableMoney: vo.NewMoney(),
+		FrozenMoney:    vo.NewMoney(),
 	}
 }
 
-func (b *Balance) SubAvailableMoney(money Money) {
+func (b *Balance) SubAvailableMoney(money vo.Money) {
 	b.AvailableMoney.Sub(money)
 }
 
-func (b *Balance) AddFrozenMoney(money Money) {
+func (b *Balance) AddFrozenMoney(money vo.Money) {
 	b.FrozenMoney.Add(money)
 }
 
-func (b *Balance) EqAvailableMoney(money Money) bool {
+func (b *Balance) EqAvailableMoney(money vo.Money) bool {
 	if b.AvailableMoney.Eq(money) {
 		return true
 	}
 	return false
 }
 
-func (b *Balance) AddAvailableMoney(money Money) {
+func (b *Balance) AddAvailableMoney(money vo.Money) {
 	b.AvailableMoney.Add(money)
 }
-func (b *Balance) SubFrozenMoney(money Money) {
+func (b *Balance) SubFrozenMoney(money vo.Money) {
 	b.FrozenMoney.Sub(money)
 }
-func (b *Balance) AddFrozenMoneyFromAvailable(money Money) {
+func (b *Balance) AddFrozenMoneyFromAvailable(money vo.Money) {
 	b.AvailableMoney.Sub(money)
 	b.FrozenMoney.Add(money)
 }
 
-func (b *Balance) DepositBalance(money Money) Balance {
+func (b *Balance) DepositBalance(money vo.Money) Balance {
 	b.AddAvailableMoney(money)
 	return *b
 }
-func (b *Balance) Purchase(money Money) Balance {
+func (b *Balance) Purchase(money vo.Money) Balance {
 	b.AddFrozenMoneyFromAvailable(money)
 	return *b
 }
