@@ -5,7 +5,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	vo2 "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/mocks"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -23,10 +23,10 @@ func TestSuccessGetByIDAccountHandler(t *testing.T) {
 	mockRepo := new(mocks.MockAccountRepository)
 	mockRepo.On("GetByID", mock.Anything, mock.Anything).Return(account.Aggregate{
 		Balance: vo.Balance{
-			AvailableMoney: vo2.Money{Value: 42.12},
-			FrozenMoney:    vo2.Money{Value: 12.42},
+			AvailableMoney: sharedVO.Money{Value: 42.12},
+			FrozenMoney:    sharedVO.Money{Value: 12.42},
 		},
-		Currency:  vo2.Currency{Code: "USD"},
+		Currency:  sharedVO.Currency{Code: "USD"},
 		Status:    vo.Status{CurrentStatus: "active"},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
