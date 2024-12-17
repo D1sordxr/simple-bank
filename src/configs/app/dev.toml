@@ -1,3 +1,6 @@
+todo: change to yaml
+
+
 [app]
 mode='development'
 
@@ -9,7 +12,7 @@ base_url_prefix = "/api/v1"
 [db]
 host = "localhost"
 port = 5432
-database = "BlogApp"
+database = "dbName"
 user = "postgres"
 password = "1234"
 migration = true
