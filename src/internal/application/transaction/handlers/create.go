@@ -27,20 +27,19 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 
 	txID := sharedVO.NewUUID()
 
+	var err error
 	var sourceAccountID, destinationAccountID *sharedVO.UUID
 	if len(c.SourceAccountID) != 0 {
-		parsedSrcID, err := sharedVO.NewPointerUUIDFromString(c.SourceAccountID)
+		sourceAccountID, err = sharedVO.NewPointerUUIDFromString(c.SourceAccountID)
 		if err != nil {
 			return commands.CreateTransactionDTO{}, err
 		}
-		sourceAccountID = parsedSrcID
 	}
 	if len(c.DestinationAccountID) != 0 {
-		parsedDestID, err := sharedVO.NewPointerUUIDFromString(c.DestinationAccountID)
+		destinationAccountID, err = sharedVO.NewPointerUUIDFromString(c.DestinationAccountID)
 		if err != nil {
 			return commands.CreateTransactionDTO{}, err
 		}
-		destinationAccountID = parsedDestID
 	}
 
 	currency, err := sharedVO.NewCurrency(c.Currency)
