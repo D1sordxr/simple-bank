@@ -11,15 +11,15 @@ type Description struct {
 	Value string
 }
 
-func NewDescription(value string) (Description, error) {
+func NewDescription(value string) (*Description, error) {
 	if len(value) == 0 {
-		return Description{}, nil
+		return nil, nil
 	}
 	value = strings.TrimSpace(value)
 	if len(value) > maxDescriptionLength {
-		return Description{}, exceptions.InvalidLength
+		return nil, exceptions.InvalidLength
 	}
-	return Description{Value: value}, nil
+	return &Description{Value: value}, nil
 }
 
 func (d Description) String() string {

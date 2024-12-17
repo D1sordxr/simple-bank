@@ -6,6 +6,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
 )
 
 type CreateTransactionHandler struct {
@@ -24,7 +25,7 @@ func NewCreateTransactionHandler(repo transaction.Repository,
 func (h CreateTransactionHandler) Handle(ctx context.Context,
 	c commands.CreateTransactionCommand) (commands.CreateTransactionDTO, error) {
 
-	transactionID := sharedVO.NewUUID()
+	txID := sharedVO.NewUUID()
 
 	var sourceAccountID, destinationAccountID *sharedVO.UUID
 	if len(c.SourceAccountID) != 0 {
@@ -43,6 +44,22 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 	}
 
 	currency, err := sharedVO.NewCurrency(c.Currency)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	amount := sharedVO.NewMoneyFromFloat(c.Amount)
+	txStatus := vo.NewTransactionStatus()
+	txType, err := vo.NewType(c.Type)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	description, err := vo.NewDescription(c.Description)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+
+	txAggregate, err := transaction.NewTransaction(
+		txID, sourceAccountID, destinationAccountID, currency, amount, txStatus, txType, description)
 	if err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}
