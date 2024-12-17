@@ -4,14 +4,13 @@ import (
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/exceptions"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
-	"github.com/google/uuid"
 	"time"
 )
 
 type Aggregate struct {
-	TransactionID        uuid.UUID            // unique identifier for the transaction
-	SourceAccountID      *uuid.UUID           // source account (nullable for deposits)
-	DestinationAccountID *uuid.UUID           // destination account (nullable for withdrawals)
+	TransactionID        sharedVO.UUID        // unique identifier for the transaction
+	SourceAccountID      *sharedVO.UUID       // source account (nullable for deposits)
+	DestinationAccountID *sharedVO.UUID       // destination account (nullable for withdrawals)
 	Currency             sharedVO.Currency    // transaction currency
 	Amount               sharedVO.Money       // transaction amount
 	TransactionStatus    vo.TransactionStatus // status: initiated, completed, failed, canceled
@@ -22,24 +21,28 @@ type Aggregate struct {
 }
 
 func NewTransaction(
-	txID uuid.UUID,
-	sourceAccountID *uuid.UUID,
-	destinationAccountID *uuid.UUID,
+	txID sharedVO.UUID,
+	sourceAccountID *sharedVO.UUID,
+	destinationAccountID *sharedVO.UUID,
 	currency sharedVO.Currency,
 	amount sharedVO.Money,
 	txType vo.Type,
 	description *vo.Description) (Aggregate, error) {
-	if txID == uuid.Nil {
+	if txID.IsNil() {
 		return Aggregate{}, exceptions.InvalidTxID
 	}
-	if sourceAccountID == nil && txType.Value != vo.DepositType {
+	if (sourceAccountID == nil || sourceAccountID.IsNil()) && txType.Value != vo.DepositType {
 		return Aggregate{}, exceptions.NoSourceWithDepositType
 	}
-	if destinationAccountID == nil && txType.Value != vo.WithdrawalType {
+	if (destinationAccountID == nil || destinationAccountID.IsNil()) && txType.Value != vo.WithdrawalType {
 		return Aggregate{}, exceptions.NoDestinationWithWithdrawalType
 	}
-	if sourceAccountID != nil && destinationAccountID != nil && *sourceAccountID == *destinationAccountID {
-		return Aggregate{}, exceptions.EqualUUIDs
+	// Prevent transactions between the same accounts
+	if sourceAccountID != nil && destinationAccountID != nil &&
+		!sourceAccountID.IsNil() && !destinationAccountID.IsNil() {
+		if sourceAccountID.Value() == destinationAccountID.Value() {
+			return Aggregate{}, exceptions.EqualUUIDs
+		}
 	}
 
 	status := vo.NewTransactionStatus()

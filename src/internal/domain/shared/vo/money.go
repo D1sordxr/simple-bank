@@ -8,6 +8,10 @@ func NewMoney() Money {
 	return Money{Value: 0}
 }
 
+func NewMoneyFromFloat(money float64) Money {
+	return Money{Value: money}
+}
+
 func (m *Money) Sub(money Money) {
 	m.Value -= money.Value
 }
