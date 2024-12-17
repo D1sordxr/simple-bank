@@ -64,7 +64,27 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 		return commands.CreateTransactionDTO{}, err
 	}
 
-	_ = ctx
+	uow := h.UoWManager.GetUoW()
+	tx, err := uow.Begin(ctx)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			_ = uow.Rollback(ctx)
+			panic(r)
+		}
+		if err != nil {
+			_ = uow.Rollback(ctx)
+		}
+	}()
 
+	err = h.Repository.Create(ctx, tx, txAggregate)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	if err = uow.Commit(ctx); err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
 	return commands.CreateTransactionDTO{}, nil
 }
