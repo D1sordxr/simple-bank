@@ -26,6 +26,7 @@ func NewTransaction(
 	destinationAccountID *sharedVO.UUID,
 	currency sharedVO.Currency,
 	amount sharedVO.Money,
+	status vo.TransactionStatus,
 	txType vo.Type,
 	description *vo.Description) (Aggregate, error) {
 	if txID.IsNil() {
@@ -45,7 +46,6 @@ func NewTransaction(
 		}
 	}
 
-	status := vo.NewTransactionStatus()
 	return Aggregate{
 		TransactionID:        txID,
 		SourceAccountID:      sourceAccountID,
