@@ -82,6 +82,9 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 	if err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}
+
+	// TODO: outbox
+
 	if err = uow.Commit(ctx); err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}

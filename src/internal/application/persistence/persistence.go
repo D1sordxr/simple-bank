@@ -19,3 +19,7 @@ type UnitOfWork interface {
 
 	// TODO: PublishEvents(ctx context.Context) error
 }
+
+type TransactionOutbox interface {
+	CreateEvent(ctx context.Context, event []byte) error
+}
