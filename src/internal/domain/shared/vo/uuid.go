@@ -6,12 +6,12 @@ import (
 )
 
 type UUID struct {
-	value uuid.UUID
+	Value uuid.UUID
 }
 
 // NewUUID creates a new UUID
 func NewUUID() UUID {
-	return UUID{value: uuid.New()}
+	return UUID{Value: uuid.New()}
 }
 
 // NewUUIDFromString parses a string into a UUID or returns an error
@@ -20,7 +20,7 @@ func NewUUIDFromString(input string) (UUID, error) {
 	if err != nil {
 		return UUID{}, exceptions.InvalidUUID
 	}
-	return UUID{value: parsed}, nil
+	return UUID{Value: parsed}, nil
 }
 
 // NewPointerUUID creates a new pointer to UUID
@@ -38,17 +38,12 @@ func NewPointerUUIDFromString(input string) (*UUID, error) {
 	return &u, nil
 }
 
-// Value returns the underlying UUID
-func (u UUID) Value() uuid.UUID {
-	return u.value
-}
-
 // String returns the string representation of the UUID
 func (u UUID) String() string {
-	return u.value.String()
+	return u.Value.String()
 }
 
 // IsNil checks if the UUID is nil
 func (u UUID) IsNil() bool {
-	return u.value == uuid.Nil
+	return u.Value == uuid.Nil
 }

@@ -41,7 +41,7 @@ func NewTransaction(
 	// Prevent transactions between the same accounts
 	if sourceAccountID != nil && destinationAccountID != nil &&
 		!sourceAccountID.IsNil() && !destinationAccountID.IsNil() {
-		if sourceAccountID.Value() == destinationAccountID.Value() {
+		if sourceAccountID.Value == destinationAccountID.Value {
 			return Aggregate{}, exceptions.EqualUUIDs
 		}
 	}
