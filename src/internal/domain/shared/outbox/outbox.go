@@ -10,7 +10,7 @@ import (
 
 type Outbox struct {
 	OutboxID       sharedVO.UUID     // Outbox unique ID
-	AggregateID    vo.AggregateID    // Client: 1, Account: 2, Transaction: 3
+	AggregateID    sharedVO.UUID     // References to aggregate unique ID
 	AggregateType  vo.AggregateType  // Client, Account, Transaction
 	MessageType    vo.MessageType    // Created, Updated, Deleted
 	MessagePayload vo.MessagePayload // Contains marshalled JSON
