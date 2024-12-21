@@ -1,0 +1,9 @@
+CREATE TABLE accounts (
+    id UUID PRIMARY KEY,
+    client_id UUID NOT NULL,
+    balance NUMERIC NOT NULL,
+    currency VARCHAR(10) NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
