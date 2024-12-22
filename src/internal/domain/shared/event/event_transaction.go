@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func NewTransactionEvent(tx transaction.Aggregate) (Event, error) {
+func NewTransactionCreatedEvent(tx transaction.Aggregate) (Event, error) {
 	eventID := sharedVO.NewUUID()
 	aggregateID := tx.TransactionID
 	aggregateType := vo.NewTransactionAggregateType()

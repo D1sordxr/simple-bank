@@ -39,14 +39,14 @@ func TestSuccessNewTransactionOutbox(t *testing.T) {
 		Timestamp:            time.Now(),
 	}
 
-	txOutbox, err := event.NewTransactionOutbox(mockTxAggregate)
+	txOutbox, err := event.NewTransactionCreatedEvent(mockTxAggregate)
 	if err != nil {
 		t.Fatalf("error: %s", err.Error())
 	}
 
 	t.Logf("\nTransactionAggregate: %v\nTransactionOutbox: %v\n", mockTxAggregate, txOutbox)
 
-	marshalledPayload, err := json.Marshal(txOutbox.MessagePayload)
+	marshalledPayload, err := json.Marshal(txOutbox.Payload)
 	if err != nil {
 		t.Fatalf("failed to marshal message payload: %v", err)
 	}
