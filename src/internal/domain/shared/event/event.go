@@ -10,7 +10,7 @@ type Event struct {
 	EventID       sharedVO.UUID    // Event unique ID
 	AggregateID   sharedVO.UUID    // References to aggregate unique ID
 	AggregateType vo.AggregateType // Client, Account, Transaction
-	EventType     vo.MessageType   // Created, Updated, Deleted
+	EventType     vo.EventType     // Created, Updated, Deleted
 	Payload       vo.EventPayload  // Contains marshalled JSON
 	CreatedAt     time.Time        // Creation time
 }

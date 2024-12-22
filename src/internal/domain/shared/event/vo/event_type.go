@@ -10,21 +10,21 @@ const (
 	TypeDeleted = "Deleted"
 )
 
-type MessageType struct {
+type EventType struct {
 	Type string
 }
 
-func NewEventType(t string) (MessageType, error) {
+func NewEventType(t string) (EventType, error) {
 	if !isValidMessageType(t) {
-		return MessageType{}, exceptions.InvalidEventType
+		return EventType{}, exceptions.InvalidEventType
 	}
-	return MessageType{Type: t}, nil
+	return EventType{Type: t}, nil
 }
 
 func isValidMessageType(t string) bool {
 	return t == TypeCreated || t == TypeUpdated || t == TypeDeleted
 }
 
-func (m MessageType) String() string {
-	return m.Type
+func (e EventType) String() string {
+	return e.Type
 }
