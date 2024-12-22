@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event/exceptions"
 )
 
 const (
@@ -16,7 +16,7 @@ type MessageType struct {
 
 func NewEventType(t string) (MessageType, error) {
 	if !isValidMessageType(t) {
-		return MessageType{}, exceptions.InvalidMessageType
+		return MessageType{}, exceptions.InvalidEventType
 	}
 	return MessageType{Type: t}, nil
 }

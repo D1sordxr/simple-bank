@@ -2,7 +2,7 @@ package vo
 
 import (
 	"encoding/json"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event/exceptions"
 )
 
 type EventPayload struct {
