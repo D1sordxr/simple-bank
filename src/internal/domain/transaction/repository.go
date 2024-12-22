@@ -1,12 +1,17 @@
 package transaction
 
-import "context"
+import (
+	"context"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
+)
 
 type Repository interface {
 	Create(ctx context.Context, tx interface{}, transaction Aggregate) error
 
-	// TODO: SaveEvent(ctx, tx, event) // Saves event to EventStore
+	// SaveEvent saves an event to EventStore
+	SaveEvent(ctx context.Context, tx interface{}, event event.Event) error
 
-	// TODO: SaveOutboxEvent(ctx, tx, outboxEvent) // Saves to Outbox
-
+	// SaveOutboxEvent saves an event to Outbox
+	SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error
 }

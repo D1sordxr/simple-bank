@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
@@ -78,12 +80,25 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 		}
 	}()
 
-	err = h.Repository.Create(ctx, tx, txAggregate)
-	if err != nil {
+	if err = h.Repository.Create(ctx, tx, txAggregate); err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}
 
-	// TODO: outbox
+	txEvent, err := event.NewTransactionCreatedEvent(txAggregate)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	if err = h.Repository.SaveEvent(ctx, tx, txEvent); err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+
+	outboxEvent, err := outbox.NewOutboxEvent(txEvent)
+	if err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
+	if err = h.Repository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
+		return commands.CreateTransactionDTO{}, err
+	}
 
 	if err = uow.Commit(ctx); err != nil {
 		return commands.CreateTransactionDTO{}, err
