@@ -2,8 +2,8 @@ package account
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
-	vo2 "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+	vo2 "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/google/uuid"
 	"time"
 )
@@ -23,7 +23,7 @@ func NewAccount(accountID uuid.UUID,
 	balance vo.Balance,
 	currency vo2.Currency) (Aggregate, error) {
 	if accountID == uuid.Nil || clientID == uuid.Nil {
-		return Aggregate{}, exceptions.InvalidUUID
+		return Aggregate{}, shared_exceptions.InvalidUUID
 	}
 	return Aggregate{
 		AccountID: accountID,

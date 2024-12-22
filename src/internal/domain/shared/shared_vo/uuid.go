@@ -1,7 +1,7 @@
-package vo
+package shared_vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	"github.com/google/uuid"
 )
 
@@ -18,7 +18,7 @@ func NewUUID() UUID {
 func NewUUIDFromString(input string) (UUID, error) {
 	parsed, err := uuid.Parse(input)
 	if err != nil {
-		return UUID{}, exceptions.InvalidUUID
+		return UUID{}, shared_exceptions.InvalidUUID
 	}
 	return UUID{Value: parsed}, nil
 }

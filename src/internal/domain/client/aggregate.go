@@ -3,7 +3,7 @@ package client
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	"github.com/google/uuid"
 )
 
@@ -22,7 +22,7 @@ func NewClient(clientID uuid.UUID,
 	status vo.Status) (Aggregate, error) {
 
 	if clientID == uuid.Nil {
-		return Aggregate{}, exceptions.InvalidUUID
+		return Aggregate{}, shared_exceptions.InvalidUUID
 	}
 
 	return Aggregate{

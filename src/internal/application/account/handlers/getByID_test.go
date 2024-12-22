@@ -5,7 +5,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/mocks"
 	"github.com/stretchr/testify/mock"
 	"testing"

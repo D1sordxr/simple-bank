@@ -1,4 +1,4 @@
-package vo
+package shared_vo
 
 type Money struct {
 	Value float64

@@ -1,7 +1,7 @@
-package vo
+package shared_vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 )
 
 var validCurrencies = map[string]bool{
@@ -16,7 +16,7 @@ type Currency struct {
 
 func NewCurrency(code string) (Currency, error) {
 	if !validCurrencies[code] {
-		return Currency{}, exceptions.InvalidCurrency
+		return Currency{}, shared_exceptions.InvalidCurrency
 	}
 	return Currency{Code: code}, nil
 

@@ -14,7 +14,7 @@ type MessageType struct {
 	Type string
 }
 
-func NewMessageType(t string) (MessageType, error) {
+func NewEventType(t string) (MessageType, error) {
 	if !isValidMessageType(t) {
 		return MessageType{}, exceptions.InvalidMessageType
 	}

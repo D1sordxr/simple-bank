@@ -6,8 +6,8 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/exceptions"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/google/uuid"
 )
 
@@ -38,7 +38,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 
 	err = h.Repository.ClientExists(ctx, clientID)
 	if err != nil {
-		return commands.CreateDTO{}, exceptions.ClientIDNotFound
+		return commands.CreateDTO{}, shared_exceptions.ClientIDNotFound
 	}
 
 	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency)

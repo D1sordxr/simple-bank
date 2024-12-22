@@ -2,8 +2,8 @@ package tests
 
 import (
 	"encoding/json"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
 	"testing"
@@ -39,7 +39,7 @@ func TestSuccessNewTransactionOutbox(t *testing.T) {
 		Timestamp:            time.Now(),
 	}
 
-	txOutbox, err := outbox.NewTransactionOutbox(mockTxAggregate)
+	txOutbox, err := event.NewTransactionOutbox(mockTxAggregate)
 	if err != nil {
 		t.Fatalf("error: %s", err.Error())
 	}

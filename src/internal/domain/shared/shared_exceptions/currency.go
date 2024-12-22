@@ -1,4 +1,4 @@
-package exceptions
+package shared_exceptions
 
 import "errors"
 
