@@ -1,4 +1,4 @@
-package converters
+package transaction
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
