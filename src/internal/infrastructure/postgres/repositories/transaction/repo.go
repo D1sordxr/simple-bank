@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
+	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -32,7 +33,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
                           ) 
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
 
-	model := ConvertAggregateToModel(transaction)
+	model := converters.ConvertAggregateToModel(transaction)
 
 	_, err := conn.Exec(ctx, query,
 		model.ID,
@@ -50,7 +51,6 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
 	}
 
 	return nil
-
 }
 
 func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, transaction transaction.Aggregate) error {
