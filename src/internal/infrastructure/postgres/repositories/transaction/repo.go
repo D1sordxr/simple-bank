@@ -18,7 +18,39 @@ func NewTransactionRepository(conn *pgx.Conn) *Repository {
 }
 
 func (r *Repository) Create(ctx context.Context, tx interface{}, transaction transaction.Aggregate) error {
+	conn := tx.(pgx.Tx)
+	query := `INSERT INTO transactions (
+                          id, 
+                          source_account_id, 
+                          destination_account_id,
+                          currency,
+                          amount,
+                          status,
+                          type,
+                          description,
+                          created_at
+                          ) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
+
+	model := ConvertAggregateToModel(transaction)
+
+	_, err := conn.Exec(ctx, query,
+		model.ID,
+		model.SourceAccountID,
+		model.DestinationAccountID,
+		model.Currency,
+		model.Amount,
+		model.Status,
+		model.Type,
+		model.Description,
+		model.CreatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
+
 }
 
 func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, transaction transaction.Aggregate) error {
