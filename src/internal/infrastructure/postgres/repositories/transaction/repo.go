@@ -5,8 +5,9 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared"
-	converter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/transaction"
+	eventConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/event"
+	outboxConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/outbox"
+	mainConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/transaction"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -35,7 +36,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
                           ) 
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
 
-	model := converter.ConvertAggregateToModel(transaction)
+	model := mainConverter.ConvertAggregateToModel(transaction)
 
 	_, err := conn.Exec(ctx, query,
 		model.ID,
@@ -57,7 +58,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
 
 func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.Event) error {
 	conn := tx.(pgx.Tx)
-	query := `INSERT INTO transactions (
+	query := `INSERT INTO events (
                           id, 
                           aggregate_id, 
                           aggregate_type,
@@ -67,7 +68,7 @@ func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.
                           ) 
 				VALUES ($1, $2, $3, $4, $5, $6);`
 
-	model := shared.ConvertAggregateToModel(event)
+	model := eventConverter.ConvertAggregateToModel(event)
 
 	_, err := conn.Exec(ctx, query,
 		model.ID,
@@ -80,9 +81,37 @@ func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error {
+	conn := tx.(pgx.Tx)
+	query := `INSERT INTO outbox (
+                          id, 
+                          aggregate_id, 
+                          aggregate_type,
+                          message_type,
+                          message_payload,
+                          status,
+                          created_at
+                          ) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7);`
+
+	model := outboxConverter.ConvertAggregateToModel(outbox)
+
+	_, err := conn.Exec(ctx, query,
+		model.ID,
+		model.AggregateID,
+		model.AggregateType,
+		model.MessageType,
+		model.MessagePayload,
+		model.Status,
+		model.CreatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

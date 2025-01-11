@@ -1,4 +1,4 @@
-package shared
+package event
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
