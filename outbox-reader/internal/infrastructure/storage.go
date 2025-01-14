@@ -1,11 +1,13 @@
 package infrastructure
 
-import "github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
+import (
+	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
+)
 
 type Storage struct {
-	OutboxRepository outbox.Repository
+	OutboxRepository *outbox.Repository
 }
 
-func NewStorage(outboxRepo outbox.Repository) *Storage {
+func NewStorage(outboxRepo *outbox.Repository) *Storage {
 	return &Storage{OutboxRepository: outboxRepo}
 }
