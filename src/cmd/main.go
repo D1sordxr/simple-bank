@@ -1,6 +1,11 @@
 package main
 
-// main is not showing something interesting yet
+// main is not showing anything interesting yet
 func main() {
-	// TODO: finish logic -> infra -> presentation
+	// TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
+	// TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
+	// TODO: Transaction - presentation (grpc)
+
+	// TODO: Outbox reader and Kafka producer service
+	// TODO: Kafka consumer service
 }
