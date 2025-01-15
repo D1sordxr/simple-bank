@@ -2,6 +2,10 @@ package outbox
 
 import "time"
 
+const (
+	BatchSize = 3
+)
+
 type Aggregate struct {
 	OutboxID       string
 	AggregateID    string

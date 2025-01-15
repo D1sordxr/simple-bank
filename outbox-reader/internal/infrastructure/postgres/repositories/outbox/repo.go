@@ -2,6 +2,7 @@ package outbox
 
 import (
 	"context"
+	"errors"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
@@ -30,6 +31,9 @@ func (r *Repository) FetchPendingMessages(ctx context.Context, tx interface{}, l
 
 	rows, err := conn.Query(ctx, query, limit)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return []outbox.Aggregate{}, nil
+		}
 		return nil, QueryErr
 	}
 	defer rows.Close()
