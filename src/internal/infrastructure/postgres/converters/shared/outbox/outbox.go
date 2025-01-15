@@ -7,7 +7,7 @@ import (
 
 func ConvertAggregateToModel(outbox outbox.Outbox) models.Outbox {
 	return models.Outbox{
-		OutboxID:       outbox.OutboxID.Value,
+		ID:             outbox.OutboxID.Value,
 		AggregateID:    outbox.AggregateID.Value,
 		AggregateType:  outbox.AggregateType.Type,
 		MessageType:    outbox.MessageType.Type,

@@ -3,6 +3,7 @@ package outbox
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
+	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
 	"github.com/jackc/pgx/v5"
 )
@@ -16,12 +17,20 @@ func NewOutboxRepository(conn *pgx.Conn) *Repository {
 }
 
 func (r *Repository) FetchPendingMessages(ctx context.Context, tx interface{}, limit int) ([]outbox.Aggregate, error) {
-	conn := tx.(pgx.Tx)
-	query := ` TODO `
+	conn, ok := tx.(pgx.Tx)
+	if !ok {
+		return nil, InvalidTxType
+	}
+
+	query := `SELECT id, aggregate_id, aggregate_type, message_type, message_payload, status, created_at
+				FROM outbox
+				WHERE status = 'pending'
+				ORDER BY created_at
+				LIMIT $1`
 
 	rows, err := conn.Query(ctx, query, limit)
 	if err != nil {
-		return nil, err
+		return nil, QueryErr
 	}
 	defer rows.Close()
 
@@ -38,14 +47,17 @@ func (r *Repository) FetchPendingMessages(ctx context.Context, tx interface{}, l
 			&msgModel.CreatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, RowScanningErr
 		}
-		// TODO: message := converters.ConvertModelToAggregate(msgModel)
-		message := outbox.Aggregate{}
+		message := converters.ConvertModelToAggregate(msgModel)
 		messages = append(messages, message)
 	}
 
-	return nil, nil
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return messages, nil
 }
 
 func (r *Repository) MarkAsProcessed(ctx context.Context, tx interface{}, id string) error {
