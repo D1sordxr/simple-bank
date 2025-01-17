@@ -9,9 +9,9 @@ type UoWManager interface {
 }
 
 type UnitOfWork interface {
-	Begin(ctx context.Context) (interface{}, error)
-	Commit(ctx context.Context) error
-	Rollback(ctx context.Context) error
+	Begin() (interface{}, error)
+	Commit() error
+	Rollback() error
 
 	// TODO: Clients() ClientRepository
 	// TODO: Accounts() AccountRepository

@@ -4,16 +4,16 @@ import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	"github.com/jackc/pgx/v5"
+	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 )
 
 // TODO: implement methods
 
 type Repository struct {
-	Conn *pgx.Conn
+	Conn *postgres.Connection
 }
 
-func NewTransactionRepository(conn *pgx.Conn) *Repository {
+func NewAccountRepository(conn *postgres.Connection) *Repository {
 	return &Repository{Conn: conn}
 }
 

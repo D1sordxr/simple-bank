@@ -1,0 +1,18 @@
+app:
+  mode: "local"
+
+logger:
+  log_level: "info"
+  log_output: ""
+
+storage: # DSN: host=localhost user=postgres password=rootroot dbname=BankApp port=5433 sslmode=disable
+  host: "localhost"
+  user: "postgres"
+  password: "rootroot"
+  port: 5433
+  database: "BankApp"
+  migration: true
+
+grpc:
+  port: 44044
+  timeout: 10h # no more than 5s if prod

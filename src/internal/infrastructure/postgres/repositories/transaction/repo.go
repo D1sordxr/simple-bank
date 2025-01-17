@@ -5,6 +5,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
+	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	eventConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/event"
 	outboxConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/outbox"
 	mainConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/transaction"
@@ -14,10 +15,10 @@ import (
 // TODO: implement methods
 
 type Repository struct {
-	Conn *pgx.Conn
+	Conn *postgres.Connection
 }
 
-func NewTransactionRepository(conn *pgx.Conn) *Repository {
+func NewTransactionRepository(conn *postgres.Connection) *Repository {
 	return &Repository{Conn: conn}
 }
 
