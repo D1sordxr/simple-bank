@@ -4,12 +4,13 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/google/uuid"
 	"time"
 )
 
 type Aggregate struct {
-	ClientID  uuid.UUID
+	ClientID  sharedVO.UUID
 	FullName  vo.FullName
 	Email     vo.Email
 	Phones    entity.Phones
@@ -17,13 +18,13 @@ type Aggregate struct {
 	CreatedAt time.Time
 }
 
-func NewClient(clientID uuid.UUID,
+func NewClient(clientID sharedVO.UUID,
 	name vo.FullName,
 	email vo.Email,
 	phones entity.Phones,
 	status vo.Status) (Aggregate, error) {
 
-	if clientID == uuid.Nil {
+	if clientID.Value == uuid.Nil {
 		return Aggregate{}, shared_exceptions.InvalidUUID
 	}
 

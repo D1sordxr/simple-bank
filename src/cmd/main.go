@@ -17,6 +17,8 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
+// TODO: EventStore - shared repo with SaveEvent() method
+// TODO: Outbox - shared repo with SaveOutboxEvent() method
 // TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Transaction - presentation (grpc)

@@ -7,7 +7,8 @@ import (
 	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
-	"github.com/google/uuid"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 )
 
 type CreateClientHandler struct {
@@ -24,7 +25,7 @@ func NewCreateClientHandler(repo clientRoot.Repository,
 }
 
 func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
-	clientID := uuid.New()
+	clientID := sharedVO.NewUUID()
 	fullName, err := vo.NewFullName(c.FirstName, c.MiddleName, c.LastName)
 	if err != nil {
 		return commands.CreateDTO{}, err
@@ -33,7 +34,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
-	phones, err := entity.NewPhones(c.Phones, clientID)
+	phones, err := entity.NewPhones(c.Phones, clientID.Value)
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
@@ -68,6 +69,15 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
+
+	clientEvent, err := event.NewClientCreatedEvent(client)
+	if err != nil {
+		return commands.CreateDTO{}, err
+	}
+	if err = h.Repository.SaveEvent(ctx, tx, clientEvent); err != nil {
+		return commands.CreateDTO{}, err
+	}
+
 	if err = uow.Commit(); err != nil {
 		return commands.CreateDTO{}, err
 	}
