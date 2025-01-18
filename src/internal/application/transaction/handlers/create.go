@@ -66,17 +66,17 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 	}
 
 	uow := h.UoWManager.GetUoW()
-	tx, err := uow.Begin(ctx)
+	tx, err := uow.Begin()
 	if err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
+			_ = uow.Rollback()
 			panic(r)
 		}
 		if err != nil {
-			_ = uow.Rollback(ctx)
+			_ = uow.Rollback()
 		}
 	}()
 
@@ -100,7 +100,7 @@ func (h CreateTransactionHandler) Handle(ctx context.Context,
 		return commands.CreateTransactionDTO{}, err
 	}
 
-	if err = uow.Commit(ctx); err != nil {
+	if err = uow.Commit(); err != nil {
 		return commands.CreateTransactionDTO{}, err
 	}
 

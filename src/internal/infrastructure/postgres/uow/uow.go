@@ -7,17 +7,21 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+var (
+	ctx = context.Background()
+)
+
 type UoW struct {
 	Conn *postgres.Connection
 	Tx   pgx.Tx
 }
 
 func (u *UoW) Commit() error {
-	return u.Tx.Commit(context.Background())
+	return u.Tx.Commit(ctx)
 }
 
 func (u *UoW) Rollback() error {
-	err := u.Tx.Rollback(context.Background())
+	err := u.Tx.Rollback(ctx)
 	if err != nil {
 		return err
 	}
@@ -25,7 +29,7 @@ func (u *UoW) Rollback() error {
 }
 
 func (u *UoW) Begin() (interface{}, error) {
-	tx, err := u.Conn.Begin(context.Background())
+	tx, err := u.Conn.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
