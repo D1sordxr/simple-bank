@@ -31,15 +31,15 @@ func main() {
 	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
 
 	uowManager := loadPostgresUoW.NewUoWManager(databaseConn)
-	clientRepo := loadPostgresClientRepo.NewClientRepository(databaseConn)
-	accountRepo := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
-	transactionRepo := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
+	clientRepository := loadPostgresClientRepo.NewClientRepository(databaseConn)
+	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
+	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
 
 	storage := loadStorage.NewStorage( // TODO: finish client and account repos
-		uowManager,      // uow implementation
-		clientRepo,      // client repository implementation
-		accountRepo,     // account repository implementation
-		transactionRepo, // transaction repository implementation
+		uowManager,            // uow implementation
+		clientRepository,      // client repository implementation
+		accountRepository,     // account repository implementation
+		transactionRepository, // transaction repository implementation
 	)
 
 	createClientCommand := loadClientCommands.NewCreateClientHandler(storage.ClientRepository, storage.UnitOfWork)

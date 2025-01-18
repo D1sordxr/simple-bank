@@ -3,17 +3,22 @@ package entity
 import (
 	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/exceptions"
+	"github.com/google/uuid"
+	"time"
 )
 
 type Phone struct {
-	Country int
-	Code    int
-	Number  int
+	PhoneID   uuid.UUID
+	ClientID  uuid.UUID
+	Country   int
+	Code      int
+	Number    int
+	CreatedAt time.Time
 }
 
 type Phones []Phone
 
-func NewPhones(phoneData []map[string]int) (Phones, error) {
+func NewPhones(phoneData []map[string]int, clientID uuid.UUID) (Phones, error) {
 	phones := make(Phones, 0, len(phoneData))
 
 	for _, data := range phoneData {
@@ -21,16 +26,27 @@ func NewPhones(phoneData []map[string]int) (Phones, error) {
 			return nil, exceptions.InvalidPhoneData
 		}
 
-		phone := Phone{
-			Country: data["country"],
-			Code:    data["code"],
-			Number:  data["number"],
-		}
+		phone := NewPhone(data, clientID)
 
 		phones = append(phones, phone)
 	}
 
 	return phones, nil
+}
+
+func NewPhone(data map[string]int, clientID uuid.UUID) Phone {
+	phoneID := uuid.New()
+
+	phone := Phone{
+		PhoneID:   phoneID,
+		ClientID:  clientID,
+		Country:   data["country"],
+		Code:      data["code"],
+		Number:    data["number"],
+		CreatedAt: time.Now(),
+	}
+
+	return phone
 }
 
 func (p Phones) Read() []string {
@@ -42,4 +58,8 @@ func (p Phones) Read() []string {
 	}
 
 	return phones
+}
+
+func (p *Phone) String() string {
+	return fmt.Sprintf("+%v(%v)%v", p.Country, p.Code, p.Number)
 }

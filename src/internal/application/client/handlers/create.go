@@ -33,7 +33,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
-	phones, err := entity.NewPhones(c.Phones)
+	phones, err := entity.NewPhones(c.Phones, clientID)
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
@@ -50,17 +50,17 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 
 	uow := h.UoWManager.GetUoW()
-	tx, err := uow.Begin(ctx)
+	tx, err := uow.Begin()
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
+			_ = uow.Rollback()
 			panic(r)
 		}
 		if err != nil {
-			_ = uow.Rollback(ctx)
+			_ = uow.Rollback()
 		}
 	}()
 
@@ -68,7 +68,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
-	if err = uow.Commit(ctx); err != nil {
+	if err = uow.Commit(); err != nil {
 		return commands.CreateDTO{}, err
 	}
 
