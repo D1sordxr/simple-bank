@@ -59,7 +59,7 @@ func main() {
 		transactionService, // transaction commands service
 	)
 
-	// TODO: gRPC := NewGRPCServer(applicationServices)
+	// TODO: gRPC := NewGRPCServer()
 
 	// TODO: app := NewApp()
 	// TODO: app.Run()
