@@ -21,6 +21,7 @@ import (
 )
 
 // TODO: Logging - finish createClientHandler logging and add logging for other services
+// TODO: Errors - customize repository errors
 // TODO: Dependencies - add for account and transaction use client as example
 // TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
