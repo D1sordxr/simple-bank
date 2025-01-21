@@ -1,10 +1,6 @@
 app:
   mode: "local"
 
-logger:
-  log_level: "info"
-  log_output: ""
-
 storage: # DSN: host=localhost user=postgres password=rootroot dbname=BankApp port=5433 sslmode=disable
   host: "localhost"
   user: "postgres"

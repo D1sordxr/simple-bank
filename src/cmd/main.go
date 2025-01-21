@@ -10,6 +10,7 @@ import (
 	loadTransactionCommands "github.com/D1sordxr/simple-banking-system/internal/application/transaction/handlers"
 	loadStorage "github.com/D1sordxr/simple-banking-system/internal/infrastructure"
 	loadConfig "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app"
+	loadLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
 	loadPostgresConnection "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	loadPostgresAccountRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/account"
 	loadPostgresClientRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/client"
@@ -19,7 +20,7 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
-// TODO: Dependencies - add for account and transaction and use client as example
+// TODO: Dependencies - add for account and transaction use client as example
 // TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Transaction - presentation (grpc)
@@ -30,6 +31,8 @@ import (
 
 func main() {
 	cfg := loadConfig.NewConfig()
+
+	_ = loadLogger.NewLogger(cfg) // TODO: add logger
 
 	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
 
