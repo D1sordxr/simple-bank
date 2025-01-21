@@ -8,7 +8,9 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
+	"log/slog"
 )
 
 type CreateClientHandler struct {
@@ -20,17 +22,32 @@ func NewCreateClientHandler(dependencies *clientDependencies.Dependencies) *Crea
 }
 
 func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
+	const op = "Services.ClientService.CreateClient"
+
+	log := h.Dependencies.Logger.With(
+		slog.String("operation", op),
+		slog.String("clientEmail", c.Email),
+	)
+
+	log.Info("Attempting to create new client")
+
 	clientID := sharedVO.NewUUID()
+
 	fullName, err := vo.NewFullName(c.FirstName, c.MiddleName, c.LastName)
 	if err != nil {
+		log.Error(sharedExceptions.LogVOCreationError("fullName"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
+
 	email, err := vo.NewEmail(c.Email)
 	if err != nil {
+		log.Error(sharedExceptions.LogVOCreationError("email"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
+
 	phones, err := entity.NewPhones(c.Phones, clientID.Value)
 	if err != nil {
+		log.Error(sharedExceptions.LogEntityCreationError("phones"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
 	status := vo.NewStatus()

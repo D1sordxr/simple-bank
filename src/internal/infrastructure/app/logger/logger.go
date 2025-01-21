@@ -17,7 +17,7 @@ type Logger struct {
 	*slog.Logger
 }
 
-func NewLogger(config *app.Config) *Logger {
+func NewSlogLogger(config *app.Config) *Logger {
 	var logger *slog.Logger
 	var handler slog.Handler
 

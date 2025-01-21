@@ -20,6 +20,7 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
+// TODO: Logging - finish createClientHandler logging and add logging for other services
 // TODO: Dependencies - add for account and transaction use client as example
 // TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
@@ -32,7 +33,7 @@ import (
 func main() {
 	cfg := loadConfig.NewConfig()
 
-	_ = loadLogger.NewLogger(cfg) // TODO: add logger
+	logger := loadLogger.NewSlogLogger(cfg)
 
 	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
 
@@ -54,6 +55,7 @@ func main() {
 	)
 
 	clientDependencies := loadClientService.NewClientDependencies(
+		logger,
 		storage.UnitOfWork,
 		storage.EventRepository,
 		storage.OutboxRepository,
