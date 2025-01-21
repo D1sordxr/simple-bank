@@ -13,12 +13,13 @@ import (
 	loadPostgresConnection "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	loadPostgresAccountRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/account"
 	loadPostgresClientRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/client"
+	loadPostgresEventRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/shared/event"
+	loadPostgresOutboxRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/shared/outbox"
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/transaction"
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
-// TODO: EventStore - shared repo with SaveEvent() method
-// TODO: Outbox - shared repo with SaveOutboxEvent() method
+// TODO: Dependencies - add for account and transaction and use client as example
 // TODO: Client - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
 // TODO: Transaction - presentation (grpc)
@@ -33,19 +34,30 @@ func main() {
 	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
 
 	uowManager := loadPostgresUoW.NewUoWManager(databaseConn)
+	eventRepository := loadPostgresEventRepo.NewEventRepository(databaseConn)
+	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databaseConn)
+
 	clientRepository := loadPostgresClientRepo.NewClientRepository(databaseConn)
 	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
 	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
 
 	storage := loadStorage.NewStorage( // TODO: finish client and account repos
-		uowManager,            // uow implementation
+		uowManager,            // unitOfWork manager implementation
+		eventRepository,       // event repository implementation
+		outboxRepository,      // outbox repository implementation
 		clientRepository,      // client repository implementation
 		accountRepository,     // account repository implementation
 		transactionRepository, // transaction repository implementation
 	)
 
-	createClientCommand := loadClientCommands.NewCreateClientHandler(storage.ClientRepository, storage.UnitOfWork)
-	updateClientCommand := loadClientCommands.NewUpdateClientHandler(storage.ClientRepository, storage.UnitOfWork)
+	clientDependencies := loadClientService.NewClientDependencies(
+		storage.UnitOfWork,
+		storage.EventRepository,
+		storage.OutboxRepository,
+		storage.ClientRepository,
+	)
+	createClientCommand := loadClientCommands.NewCreateClientHandler(clientDependencies)
+	updateClientCommand := loadClientCommands.NewUpdateClientHandler(clientDependencies) // TODO: updateClientHandler
 	clientService := loadClientService.NewClientService(createClientCommand, updateClientCommand)
 
 	createAccountCommand := loadAccountCommands.NewCreateAccountHandler(storage.AccountRepository, storage.UnitOfWork)

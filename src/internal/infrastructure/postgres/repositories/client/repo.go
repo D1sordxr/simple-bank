@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	converters "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/client"
 	"github.com/jackc/pgx/v5"
@@ -74,20 +72,6 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, client client.A
 }
 
 func (r *Repository) Update(ctx context.Context, tx interface{}, client client.Aggregate) error {
-
-	// TODO: ...
-
-	return nil
-}
-
-func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.Event) error {
-
-	// TODO: ...
-
-	return nil
-}
-
-func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error {
 
 	// TODO: ...
 

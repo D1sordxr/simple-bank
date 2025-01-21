@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
+	clientDependencies "github.com/D1sordxr/simple-banking-system/internal/application/client"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
@@ -12,16 +12,11 @@ import (
 )
 
 type CreateClientHandler struct {
-	Repository clientRoot.Repository
-	UoWManager persistence.UoWManager
+	*clientDependencies.Dependencies
 }
 
-func NewCreateClientHandler(repo clientRoot.Repository,
-	uow persistence.UoWManager) *CreateClientHandler {
-	return &CreateClientHandler{
-		UoWManager: uow,
-		Repository: repo,
-	}
+func NewCreateClientHandler(dependencies *clientDependencies.Dependencies) *CreateClientHandler {
+	return &CreateClientHandler{Dependencies: dependencies}
 }
 
 func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
@@ -40,7 +35,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 	status := vo.NewStatus()
 
-	err = h.Repository.Exists(ctx, email.Email)
+	err = h.Dependencies.ClientRepository.Exists(ctx, email.Email)
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
@@ -65,7 +60,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		}
 	}()
 
-	err = h.Repository.Create(ctx, tx, client)
+	err = h.Dependencies.ClientRepository.Create(ctx, tx, client)
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
@@ -74,7 +69,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	if err != nil {
 		return commands.CreateDTO{}, err
 	}
-	if err = h.Repository.SaveEvent(ctx, tx, clientEvent); err != nil {
+	if err = h.Dependencies.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
 		return commands.CreateDTO{}, err
 	}
 
