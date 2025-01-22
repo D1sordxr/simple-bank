@@ -47,7 +47,7 @@ func main() {
 	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
 	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
 
-	storage := loadStorage.NewStorage( // TODO: finish client and account repos
+	storage := loadStorage.NewStorage( // TODO: finish account repo
 		uowManager,            // unitOfWork manager implementation
 		eventRepository,       // event repository implementation
 		outboxRepository,      // outbox repository implementation
@@ -67,8 +67,15 @@ func main() {
 	updateClientCommand := loadClientCommands.NewUpdateClientHandler(clientDependencies) // TODO: updateClientHandler
 	clientService := loadClientService.NewClientService(createClientCommand, updateClientCommand)
 
+	accountDependencies := (
+		logger,
+		storage.UnitOfWork,
+		storage.EventRepository,
+		storage.OutboxRepository,
+		storage.AccountRepository,
+		)
 	createAccountCommand := loadAccountCommands.NewCreateAccountHandler(storage.AccountRepository, storage.UnitOfWork)
-	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(storage.AccountRepository, storage.UnitOfWork)
+	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(storage.AccountRepository, storage.UnitOfWork) // TODO: rework getByIDAccountCommand
 	accountService := loadAccountService.NewAccountService(createAccountCommand, getByIDAccountCommand)
 
 	createTransactionCommand := loadTransactionCommands.NewCreateTransactionHandler(storage.TransactionRepository, storage.UnitOfWork)

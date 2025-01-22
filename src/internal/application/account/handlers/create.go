@@ -2,41 +2,52 @@ package handlers
 
 import (
 	"context"
+	accountDeps "github.com/D1sordxr/simple-banking-system/internal/application/account"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"github.com/google/uuid"
+	"log/slog"
 )
 
 type CreateAccountHandler struct {
-	Repository accountRoot.Repository
-	UoWManager persistence.UoWManager
+	deps *accountDeps.Dependencies
 }
 
-func NewCreateAccountHandler(repo accountRoot.Repository,
-	uow persistence.UoWManager) *CreateAccountHandler {
+func NewCreateAccountHandler(dependencies *accountDeps.Dependencies) *CreateAccountHandler {
 	return &CreateAccountHandler{
-		Repository: repo,
-		UoWManager: uow,
+		deps: dependencies,
 	}
 }
 
 func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAccountCommand) (commands.CreateDTO, error) {
-	clientID, err := uuid.Parse(c.ClientID)
+	const op = "Services.AccountService.CreateAccount"
+
+	log := h.deps.Logger.With(
+		slog.String("operation", op),
+		slog.String("clientID", c.ClientID),
+	)
+
+	log.Info("Attempting to create new account")
+
+	clientID, err := sharedVO.NewUUIDFromString(c.ClientID)
 	if err != nil {
-		return commands.CreateDTO{}, err
-	}
-	accountID := uuid.New()
-	balance := vo.NewBalance()
-	currency, err := sharedVO.NewCurrency(c.Currency)
-	if err != nil {
+		log.Error(sharedExceptions.LogVOCreationError("UUID"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
 
-	err = h.Repository.ClientExists(ctx, clientID)
+	accountID := sharedVO.NewUUID()
+
+	balance := vo.NewBalance()
+
+	currency, err := sharedVO.NewCurrency(c.Currency)
+	if err != nil {
+		log.Error(sharedExceptions.LogVOCreationError("currency"), sharedExceptions.LogError(err))
+		return commands.CreateDTO{}, err
+	}
+
+	err = h.Repository.ClientExists(ctx, clientID) // remove
 	if err != nil {
 		return commands.CreateDTO{}, shared_exceptions.ClientIDNotFound
 	}
