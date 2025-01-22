@@ -14,17 +14,17 @@ import (
 )
 
 type CreateClientHandler struct {
-	*clientDependencies.Dependencies
+	deps *clientDependencies.Dependencies
 }
 
 func NewCreateClientHandler(dependencies *clientDependencies.Dependencies) *CreateClientHandler {
-	return &CreateClientHandler{Dependencies: dependencies}
+	return &CreateClientHandler{deps: dependencies}
 }
 
 func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
 	const op = "Services.ClientService.CreateClient"
 
-	log := h.Dependencies.Logger.With(
+	log := h.deps.Logger.With(
 		slog.String("operation", op),
 		slog.String("clientEmail", c.Email),
 	)
@@ -52,19 +52,22 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 	status := vo.NewStatus()
 
-	err = h.Dependencies.ClientRepository.Exists(ctx, email.Email)
+	err = h.deps.ClientRepository.Exists(ctx, email.Email)
 	if err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 
 	client, err := clientRoot.NewClient(clientID, fullName, email, phones, status)
 	if err != nil {
+		log.Error(sharedExceptions.LogAggregateCreationError("client"))
 		return commands.CreateDTO{}, err
 	}
 
-	uow := h.UoWManager.GetUoW()
+	uow := h.deps.UoWManager.GetUoW()
 	tx, err := uow.Begin()
 	if err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 	defer func() {
@@ -77,23 +80,28 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		}
 	}()
 
-	err = h.Dependencies.ClientRepository.Create(ctx, tx, client)
+	err = h.deps.ClientRepository.Create(ctx, tx, client)
 	if err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 
 	clientEvent, err := event.NewClientCreatedEvent(client)
 	if err != nil {
+		log.Error(sharedExceptions.LogEventCreationError())
 		return commands.CreateDTO{}, err
 	}
-	if err = h.Dependencies.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
+	if err = h.deps.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 
 	if err = uow.Commit(); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 
+	log.Info("Client creation completed successfully")
 	return commands.CreateDTO{
 		ClientID: clientID.String(),
 		FullName: fullName.String(),
