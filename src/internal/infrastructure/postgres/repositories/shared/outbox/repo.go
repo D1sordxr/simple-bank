@@ -2,6 +2,7 @@ package outbox
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	outboxConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/outbox"
@@ -17,6 +18,8 @@ func NewOutboxRepository(conn *postgres.Connection) *Repository {
 }
 
 func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error {
+	const op = "postgres.OutboxRepository.SaveOutboxEvent"
+
 	conn := tx.(pgx.Tx)
 	query := `INSERT INTO outbox (
                           id, 
@@ -41,7 +44,7 @@ func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox
 		model.CreatedAt,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

@@ -7,9 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-var (
-	ctx = context.Background()
-)
+var ctx = context.Background()
 
 type UoW struct {
 	Conn *postgres.Connection

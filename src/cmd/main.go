@@ -28,6 +28,7 @@ import (
 // TODO: Transaction - presentation (grpc)
 // TODO: App - run app
 
+// TODO: Redis for caching client and account data
 // TODO: Outbox reader and Kafka producer service
 // TODO: Kafka consumer service
 

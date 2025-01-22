@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	converters "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/client"
@@ -20,6 +21,8 @@ func NewClientRepository(conn *postgres.Connection) *Repository {
 }
 
 func (r *Repository) Create(ctx context.Context, tx interface{}, client client.Aggregate) error {
+	const op = "postgres.ClientRepository.Create"
+
 	conn := tx.(pgx.Tx)
 	clientsQuery := `INSERT INTO clients (
                     id, 
@@ -49,7 +52,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, client client.A
 		clientModel.CreatedAt,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, ErrFailedToCreateClient)
 	}
 
 	for _, phone := range client.Phones {
@@ -64,7 +67,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, client client.A
 			phoneModel.CreatedAt,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s: %w", op, ErrFailedToCreatePhone)
 		}
 	}
 
@@ -86,6 +89,8 @@ func (r *Repository) Load(ctx context.Context, email string) (client.Aggregate, 
 }
 
 func (r *Repository) Exists(ctx context.Context, email string) error {
+	const op = "postgres.ClientRepository.Exists"
+
 	query := `SELECT email FROM clients WHERE email = $1`
 
 	var existingEmail string
@@ -95,10 +100,10 @@ func (r *Repository) Exists(ctx context.Context, email string) error {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 	if email == existingEmail {
-		return ErrClientAlreadyExists
+		return fmt.Errorf("%s: %w", op, err)
 	}
 	return nil
 }

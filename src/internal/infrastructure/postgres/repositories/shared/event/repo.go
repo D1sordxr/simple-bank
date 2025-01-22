@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	eventConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/event"
@@ -17,6 +18,7 @@ func NewEventRepository(conn *postgres.Connection) *Repository {
 }
 
 func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.Event) error {
+	const op = "postgres.EventRepository.SaveEvent"
 	conn := tx.(pgx.Tx)
 	query := `INSERT INTO events (
                           id, 
@@ -39,7 +41,7 @@ func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.
 		model.CreatedAt,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, ErrFailedEventCreation)
 	}
 
 	return nil

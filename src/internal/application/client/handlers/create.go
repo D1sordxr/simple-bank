@@ -8,6 +8,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"log/slog"
@@ -96,6 +97,15 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		return commands.CreateDTO{}, err
 	}
 
+	outboxEvent, err := outbox.NewOutboxEvent(clientEvent)
+	if err != nil {
+		log.Error(sharedExceptions.LogOutboxCreationError())
+		return commands.CreateDTO{}, err
+	}
+	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
+	}
+
 	if err = uow.Commit(); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
@@ -104,9 +114,5 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	log.Info("Client creation completed successfully")
 	return commands.CreateDTO{
 		ClientID: clientID.String(),
-		FullName: fullName.String(),
-		Email:    email.String(),
-		Phones:   phones.Read(),
-		Status:   status.String(),
 	}, nil
 }
