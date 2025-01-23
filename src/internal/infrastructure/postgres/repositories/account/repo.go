@@ -10,8 +10,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// TODO: implement methods
-
 type Repository struct {
 	Conn *postgres.Connection
 }
@@ -27,7 +25,8 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, account account
 	accountsQuery := `INSERT INTO accounts (
                     id, 
                     client_id, 
-                    balance,
+                    available_money,
+                    frozen_money,
                     currency,
                     status,
                     created_at,
@@ -40,7 +39,8 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, account account
 	_, err := conn.Exec(ctx, accountsQuery,
 		accountModel.ID,
 		accountModel.ClientID,
-		accountModel.Balance,
+		accountModel.AvailableMoney,
+		accountModel.FrozenMoney,
 		accountModel.Currency,
 		accountModel.Status,
 		accountModel.CreatedAt,

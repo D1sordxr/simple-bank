@@ -7,12 +7,13 @@ import (
 
 func ConvertAggregateToModel(account account.Aggregate) models.Account {
 	return models.Account{
-		ID:        account.AccountID.Value,
-		ClientID:  account.ClientID.Value,
-		Balance:   account.Balance.AvailableMoney.Value,
-		Currency:  account.Currency.Code,
-		Status:    account.Status.CurrentStatus,
-		CreatedAt: account.CreatedAt,
-		UpdatedAt: account.UpdatedAt,
+		ID:             account.AccountID.Value,
+		ClientID:       account.ClientID.Value,
+		AvailableMoney: account.Balance.AvailableMoney.Value,
+		FrozenMoney:    account.Balance.FrozenMoney.Value,
+		Currency:       account.Currency.Code,
+		Status:         account.Status.CurrentStatus,
+		CreatedAt:      account.CreatedAt,
+		UpdatedAt:      account.UpdatedAt,
 	}
 }
