@@ -1,1 +1,3 @@
-﻿# Simple banking system
+﻿# simple-bank
+
+- todo: readme.md
