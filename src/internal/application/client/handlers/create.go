@@ -77,6 +77,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 			panic(r)
 		}
 		if err != nil {
+			log.Error(sharedExceptions.LogErrorAsString(err))
 			_ = uow.Rollback()
 		}
 	}()

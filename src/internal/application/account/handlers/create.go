@@ -47,35 +47,39 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 		return commands.CreateDTO{}, err
 	}
 
-	err = h.Repository.ClientExists(ctx, clientID) // remove
-	if err != nil {
-		return commands.CreateDTO{}, shared_exceptions.ClientIDNotFound
-	}
+	status := vo.NewStatus()
 
-	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency)
+	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency, status)
 	if err != nil {
+		log.Error(sharedExceptions.LogAggregateCreationError("account"))
 		return commands.CreateDTO{}, err
 	}
 
-	uow := h.UoWManager.GetUoW()
-	tx, err := uow.Begin(ctx)
+	uow := h.deps.UoWManager.GetUoW()
+	tx, err := uow.Begin()
 	if err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
+			_ = uow.Rollback()
 			panic(r)
 		}
 		if err != nil {
-			_ = uow.Rollback(ctx)
+			log.Error(sharedExceptions.LogErrorAsString(err))
+			_ = uow.Rollback()
 		}
 	}()
 
-	if err = h.Repository.Create(ctx, tx, account); err != nil {
+	if err = h.deps.AccountRepository.Create(ctx, tx, account); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
-	if err = uow.Commit(ctx); err != nil {
+
+	// TODO: add event and outbox
+
+	if err = uow.Commit(); err != nil {
 		return commands.CreateDTO{}, err
 	}
 

@@ -2,34 +2,36 @@ package account
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
-	vo2 "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"github.com/google/uuid"
+	sharedExc "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"time"
 )
 
 type Aggregate struct {
-	AccountID uuid.UUID    // unique identifier for the account
-	ClientID  uuid.UUID    // references client
-	Balance   vo.Balance   // current balance
-	Currency  vo2.Currency // account currency (USD, EUR, RUB)
-	Status    vo.Status    // status: active, closed, suspended
+	AccountID sharedVO.UUID     // unique identifier for the account
+	ClientID  sharedVO.UUID     // references client id
+	Balance   vo.Balance        // current balance
+	Currency  sharedVO.Currency // account currency (USD, EUR, RUB)
+	Status    vo.Status         // status: active, closed, suspended
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func NewAccount(accountID uuid.UUID,
-	clientID uuid.UUID,
+func NewAccount(accountID sharedVO.UUID,
+	clientID sharedVO.UUID,
 	balance vo.Balance,
-	currency vo2.Currency) (Aggregate, error) {
-	if accountID == uuid.Nil || clientID == uuid.Nil {
-		return Aggregate{}, shared_exceptions.InvalidUUID
+	currency sharedVO.Currency,
+	status vo.Status,
+) (Aggregate, error) {
+	if accountID.IsNil() || clientID.IsNil() {
+		return Aggregate{}, sharedExc.InvalidUUID
 	}
 	return Aggregate{
 		AccountID: accountID,
 		ClientID:  clientID,
 		Balance:   balance,
 		Currency:  currency,
+		Status:    status,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}, nil

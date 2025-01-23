@@ -14,8 +14,8 @@ type Status struct {
 	CurrentStatus string
 }
 
-func NewStatus(status string) (Status, error) {
-	return Status{CurrentStatus: StatusActive}, nil
+func NewStatus() Status {
+	return Status{CurrentStatus: StatusActive}
 }
 
 func (s *Status) String() string {
