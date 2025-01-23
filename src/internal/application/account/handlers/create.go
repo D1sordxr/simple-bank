@@ -6,6 +6,8 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"log/slog"
@@ -51,7 +53,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 
 	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency, status)
 	if err != nil {
-		log.Error(sharedExceptions.LogAggregateCreationError("account"))
+		log.Error(sharedExceptions.LogAggregateCreationError("account"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
 
@@ -77,9 +79,28 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 		return commands.CreateDTO{}, err
 	}
 
-	// TODO: add event and outbox
+	accountEvent, err := event.NewAccountCreatedEvent(account)
+	if err != nil {
+		log.Error(sharedExceptions.LogEventCreationError(), sharedExceptions.LogError(err))
+		return commands.CreateDTO{}, err
+	}
+	if err = h.deps.EventRepository.SaveEvent(ctx, tx, accountEvent); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
+		return commands.CreateDTO{}, err
+	}
+
+	outboxEvent, err := outbox.NewOutboxEvent(accountEvent)
+	if err != nil {
+		log.Error(sharedExceptions.LogOutboxCreationError(), sharedExceptions.LogError(err))
+		return commands.CreateDTO{}, err
+	}
+	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
+		return commands.CreateDTO{}, err
+	}
 
 	if err = uow.Commit(); err != nil {
+		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, err
 	}
 

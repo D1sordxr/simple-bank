@@ -2,9 +2,12 @@ package account
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
+	converters "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/account"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 // TODO: implement methods
@@ -17,14 +20,39 @@ func NewAccountRepository(conn *postgres.Connection) *Repository {
 	return &Repository{Conn: conn}
 }
 
-func (r *Repository) Create(ctx context.Context, tx interface{}, aggregate account.Aggregate) error {
+func (r *Repository) Create(ctx context.Context, tx interface{}, account account.Aggregate) error {
+	const op = "postgres.AccountRepository.Create"
+
+	conn := tx.(pgx.Tx)
+	accountsQuery := `INSERT INTO accounts (
+                    id, 
+                    client_id, 
+                    balance,
+                    currency,
+                    status,
+                    created_at,
+                    updated_at
+                 ) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7);`
+
+	accountModel := converters.ConvertAggregateToModel(account)
+
+	_, err := conn.Exec(ctx, accountsQuery,
+		accountModel.ID,
+		accountModel.ClientID,
+		accountModel.Balance,
+		accountModel.Currency,
+		accountModel.Status,
+		accountModel.CreatedAt,
+		accountModel.UpdatedAt,
+	)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, ErrFailedToCreateAccount)
+	}
+
 	return nil
 }
 
-func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, aggregate account.Aggregate) error {
-	return nil
-}
-
-func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error {
-	return nil
+func (r *Repository) GetByID(ctx context.Context, accountID uuid.UUID) (account.Aggregate, error) {
+	return account.Aggregate{}, nil
 }

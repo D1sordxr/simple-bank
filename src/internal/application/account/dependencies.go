@@ -16,7 +16,7 @@ type Dependencies struct {
 	AccountRepository account.Repository
 }
 
-func NewClientDependencies(
+func NewAccountDependencies(
 	logger *logger.Logger,
 	uow persistence.UoWManager,
 	event event.Repository,

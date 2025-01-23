@@ -8,11 +8,8 @@ import (
 )
 
 func NewAccountCreatedEvent(account account.Aggregate) (Event, error) {
-
-	// TODO: ...
-
 	eventID := sharedVO.NewUUID()
-	// aggregateID := account.AccountID.String()
+	aggregateID := account.AccountID
 	aggregateType := vo.NewAccountAggregateType()
 	eventType, err := vo.NewEventType(vo.TypeCreated)
 	if err != nil {
@@ -24,8 +21,8 @@ func NewAccountCreatedEvent(account account.Aggregate) (Event, error) {
 	}
 	creationTime := time.Now()
 	return Event{
-		EventID: eventID,
-		// AggregateID:   aggregateID,
+		EventID:       eventID,
+		AggregateID:   aggregateID,
 		AggregateType: aggregateType,
 		EventType:     eventType,
 		Payload:       payload,

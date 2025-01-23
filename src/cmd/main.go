@@ -20,7 +20,7 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
-// TODO: Logging - finish createClientHandler logging and add logging for other services
+// TODO: Logging - add logging for services
 // TODO: Errors - customize repository errors
 // TODO: Dependencies - add for account and transaction use client as example
 // TODO: Client - presentation (grpc)
@@ -67,14 +67,14 @@ func main() {
 	updateClientCommand := loadClientCommands.NewUpdateClientHandler(clientDependencies) // TODO: updateClientHandler
 	clientService := loadClientService.NewClientService(createClientCommand, updateClientCommand)
 
-	accountDependencies := (
+	accountDependencies := loadAccountService.NewAccountDependencies(
 		logger,
 		storage.UnitOfWork,
 		storage.EventRepository,
 		storage.OutboxRepository,
 		storage.AccountRepository,
-		)
-	createAccountCommand := loadAccountCommands.NewCreateAccountHandler(storage.AccountRepository, storage.UnitOfWork)
+	)
+	createAccountCommand := loadAccountCommands.NewCreateAccountHandler(accountDependencies)
 	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(storage.AccountRepository, storage.UnitOfWork) // TODO: rework getByIDAccountCommand
 	accountService := loadAccountService.NewAccountService(createAccountCommand, getByIDAccountCommand)
 
