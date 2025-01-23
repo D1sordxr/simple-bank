@@ -2,35 +2,46 @@ package handlers
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
+	transactionDeps "github.com/D1sordxr/simple-banking-system/internal/application/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
+	"log/slog"
 )
 
 type CreateTransactionHandler struct {
-	Repository transaction.Repository
-	UoWManager persistence.UoWManager
+	deps *transactionDeps.Dependencies
 }
 
-func NewCreateTransactionHandler(repo transaction.Repository,
-	uow persistence.UoWManager) *CreateTransactionHandler {
-	return &CreateTransactionHandler{
-		Repository: repo,
-		UoWManager: uow,
-	}
+func NewCreateTransactionHandler(deps *transactionDeps.Dependencies) *CreateTransactionHandler {
+	return &CreateTransactionHandler{deps: deps}
 }
 
-func (h CreateTransactionHandler) Handle(ctx context.Context,
+func (h *CreateTransactionHandler) Handle(ctx context.Context,
 	c commands.CreateTransactionCommand) (commands.CreateTransactionDTO, error) {
+	const op = "Services.TransactionService.CreateTransaction"
+
+	log := h.deps.Logger.With(
+		slog.String("operation", op),
+		slog.String("transactionType", c.Type),
+		slog.String("sourceAccountID", c.SourceAccountID),
+		slog.String("destinationAccountID", c.DestinationAccountID),
+	)
+
+	log.Info("Attempting to create transaction")
+
+	// TODO: logging and refactoring
 
 	txID := sharedVO.NewUUID()
 
-	var err error
-	var sourceAccountID, destinationAccountID *sharedVO.UUID
+	var (
+		sourceAccountID, destinationAccountID *sharedVO.UUID
+		err                                   error
+	)
+
 	if len(c.SourceAccountID) != 0 {
 		sourceAccountID, err = sharedVO.NewPointerUUIDFromString(c.SourceAccountID)
 		if err != nil {

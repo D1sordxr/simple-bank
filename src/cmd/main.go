@@ -75,10 +75,17 @@ func main() {
 		storage.AccountRepository,
 	)
 	createAccountCommand := loadAccountCommands.NewCreateAccountHandler(accountDependencies)
-	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(storage.AccountRepository, storage.UnitOfWork) // TODO: rework getByIDAccountCommand
+	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(accountDependencies) // TODO: rework getByIDAccountCommand
 	accountService := loadAccountService.NewAccountService(createAccountCommand, getByIDAccountCommand)
 
-	createTransactionCommand := loadTransactionCommands.NewCreateTransactionHandler(storage.TransactionRepository, storage.UnitOfWork)
+	transactionDependencies := loadTransactionService.NewTransactionDependencies(
+		logger,
+		storage.UnitOfWork,
+		storage.EventRepository,
+		storage.OutboxRepository,
+		storage.TransactionRepository,
+	)
+	createTransactionCommand := loadTransactionCommands.NewCreateTransactionHandler(transactionDependencies)
 	transactionService := loadTransactionService.NewTransactionService(createTransactionCommand)
 
 	applicationServices := loadApplicationServices.NewApplicationServices(
