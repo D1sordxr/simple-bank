@@ -103,7 +103,7 @@ func (r *Repository) Exists(ctx context.Context, email string) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	if email == existingEmail {
-		return fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, ErrClientAlreadyExists)
 	}
 	return nil
 }

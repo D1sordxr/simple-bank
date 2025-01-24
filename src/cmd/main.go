@@ -20,17 +20,14 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
-// TODO: Logging - add logging for services
-// TODO: Errors - customize repository errors
-// TODO: Dependencies - add for account and transaction use client as example
 // TODO: Client - presentation (grpc)
-// TODO: Account - finish logic (event+outbox) -> infra (repo) -> presentation (grpc)
+// TODO: Account - presentation (grpc)
 // TODO: Transaction - presentation (grpc)
 // TODO: App - run app
 
 // TODO: Redis for caching client and account data
 // TODO: Outbox reader and Kafka producer service
-// TODO: Kafka consumer service
+// TODO: Kafka consumer services to process transaction and caching client and account data
 
 func main() {
 	cfg := loadConfig.NewConfig()
@@ -47,7 +44,7 @@ func main() {
 	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
 	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
 
-	storage := loadStorage.NewStorage( // TODO: finish account repo
+	storage := loadStorage.NewStorage(
 		uowManager,            // unitOfWork manager implementation
 		eventRepository,       // event repository implementation
 		outboxRepository,      // outbox repository implementation

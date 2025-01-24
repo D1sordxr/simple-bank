@@ -54,5 +54,10 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, account account
 }
 
 func (r *Repository) GetByID(ctx context.Context, accountID uuid.UUID) (account.Aggregate, error) {
-	return account.Aggregate{}, nil
+	const (
+		op  = "postgres.AccountRepository.GetByID"
+		msg = "not implemented"
+	)
+
+	return account.Aggregate{}, fmt.Errorf("%s: %s", op, msg)
 }

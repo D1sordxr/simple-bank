@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	converter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/transaction"
@@ -17,6 +18,8 @@ func NewTransactionRepository(conn *postgres.Connection) *Repository {
 }
 
 func (r *Repository) Create(ctx context.Context, tx interface{}, transaction transaction.Aggregate) error {
+	const op = "postgres.TransactionRepository.Create"
+
 	conn := tx.(pgx.Tx)
 	query := `INSERT INTO transactions (
                           id, 
@@ -45,7 +48,7 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
 		model.CreatedAt,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, ErrFailedToCreateTransaction)
 	}
 
 	return nil
