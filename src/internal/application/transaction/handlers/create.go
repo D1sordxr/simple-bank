@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	transactionDeps "github.com/D1sordxr/simple-banking-system/internal/application/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
@@ -14,10 +13,10 @@ import (
 )
 
 type CreateTransactionHandler struct {
-	deps *transactionDeps.Dependencies
+	deps *commands.Dependencies
 }
 
-func NewCreateTransactionHandler(deps *transactionDeps.Dependencies) *CreateTransactionHandler {
+func NewCreateTransactionHandler(deps *commands.Dependencies) *CreateTransactionHandler {
 	return &CreateTransactionHandler{deps: deps}
 }
 

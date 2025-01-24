@@ -1,10 +1,9 @@
-package handlers
+package tests
 
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/mocks"
-	"github.com/stretchr/testify/mock"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/handlers"
 	"testing"
 )
 
@@ -21,12 +20,12 @@ func TestSuccessCreateClientHandler(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	mockRepo := new(mocks.MockClientRepository)
-	mockRepo.On("Exists", mock.Anything, mock.Anything).Return(nil)
-	mockRepo.On("Create", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-	createClient := NewCreateClientHandler(mockRepo, &mocks.TestUoWManager{})
-	response, err := createClient.Handle(ctx, command)
+	mockDeps := mockClientDeps()
+
+	createClientService := handlers.NewCreateClientHandler(mockDeps)
+
+	response, err := createClientService.Handle(ctx, command)
 	if err != nil {
 		t.Errorf("expected no error, got %v", err)
 		return

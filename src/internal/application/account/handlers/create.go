@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	accountDeps "github.com/D1sordxr/simple-banking-system/internal/application/account"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
@@ -14,10 +13,10 @@ import (
 )
 
 type CreateAccountHandler struct {
-	deps *accountDeps.Dependencies
+	deps *commands.Dependencies
 }
 
-func NewCreateAccountHandler(dependencies *accountDeps.Dependencies) *CreateAccountHandler {
+func NewCreateAccountHandler(dependencies *commands.Dependencies) *CreateAccountHandler {
 	return &CreateAccountHandler{
 		deps: dependencies,
 	}

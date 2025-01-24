@@ -3,10 +3,13 @@ package main
 import (
 	loadApplicationServices "github.com/D1sordxr/simple-banking-system/internal/application"
 	loadAccountService "github.com/D1sordxr/simple-banking-system/internal/application/account"
+	loadAccountDeps "github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	loadAccountCommands "github.com/D1sordxr/simple-banking-system/internal/application/account/handlers"
 	loadClientService "github.com/D1sordxr/simple-banking-system/internal/application/client"
+	loadClientDeps "github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
 	loadClientCommands "github.com/D1sordxr/simple-banking-system/internal/application/client/handlers"
 	loadTransactionService "github.com/D1sordxr/simple-banking-system/internal/application/transaction"
+	loadTransactionDeps "github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
 	loadTransactionCommands "github.com/D1sordxr/simple-banking-system/internal/application/transaction/handlers"
 	loadStorage "github.com/D1sordxr/simple-banking-system/internal/infrastructure"
 	loadConfig "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app"
@@ -20,9 +23,7 @@ import (
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 )
 
-// TODO: Client - presentation (grpc)
-// TODO: Account - presentation (grpc)
-// TODO: Transaction - presentation (grpc)
+// TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: App - run app
 
 // TODO: Redis for caching client and account data
@@ -53,7 +54,7 @@ func main() {
 		transactionRepository, // transaction repository implementation
 	)
 
-	clientDependencies := loadClientService.NewClientDependencies(
+	clientDependencies := loadClientDeps.NewClientDependencies(
 		logger,
 		storage.UnitOfWork,
 		storage.EventRepository,
@@ -64,7 +65,7 @@ func main() {
 	updateClientCommand := loadClientCommands.NewUpdateClientHandler(clientDependencies) // TODO: updateClientHandler
 	clientService := loadClientService.NewClientService(createClientCommand, updateClientCommand)
 
-	accountDependencies := loadAccountService.NewAccountDependencies(
+	accountDependencies := loadAccountDeps.NewAccountDependencies(
 		logger,
 		storage.UnitOfWork,
 		storage.EventRepository,
@@ -75,7 +76,7 @@ func main() {
 	getByIDAccountCommand := loadAccountCommands.NewGetByIDAccountHandler(accountDependencies) // TODO: rework getByIDAccountCommand
 	accountService := loadAccountService.NewAccountService(createAccountCommand, getByIDAccountCommand)
 
-	transactionDependencies := loadTransactionService.NewTransactionDependencies(
+	transactionDependencies := loadTransactionDeps.NewTransactionDependencies(
 		logger,
 		storage.UnitOfWork,
 		storage.EventRepository,

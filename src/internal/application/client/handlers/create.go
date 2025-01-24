@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	clientDependencies "github.com/D1sordxr/simple-banking-system/internal/application/client"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
 	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
@@ -15,10 +14,10 @@ import (
 )
 
 type CreateClientHandler struct {
-	deps *clientDependencies.Dependencies
+	deps *commands.Dependencies
 }
 
-func NewCreateClientHandler(dependencies *clientDependencies.Dependencies) *CreateClientHandler {
+func NewCreateClientHandler(dependencies *commands.Dependencies) *CreateClientHandler {
 	return &CreateClientHandler{deps: dependencies}
 }
 
@@ -114,6 +113,10 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 
 	log.Info("Client creation completed successfully")
 	return commands.CreateDTO{
-		ClientID: clientID.String(),
+		ClientID: client.ClientID.String(),
+		FullName: client.FullName.String(),
+		Email:    client.Email.String(),
+		Phones:   client.Phones.Read(),
+		Status:   client.Status.String(),
 	}, nil
 }

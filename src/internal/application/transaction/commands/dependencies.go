@@ -1,4 +1,4 @@
-package transaction
+package commands
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"

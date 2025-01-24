@@ -2,17 +2,16 @@ package handlers
 
 import (
 	"context"
-	accountDeps "github.com/D1sordxr/simple-banking-system/internal/application/account"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/exceptions"
 	"github.com/google/uuid"
 )
 
 type GetByIDAccountHandler struct {
-	deps *accountDeps.Dependencies
+	deps *commands.Dependencies
 }
 
-func NewGetByIDAccountHandler(deps *accountDeps.Dependencies) *GetByIDAccountHandler {
+func NewGetByIDAccountHandler(deps *commands.Dependencies) *GetByIDAccountHandler {
 	return &GetByIDAccountHandler{
 		deps: deps,
 	}
