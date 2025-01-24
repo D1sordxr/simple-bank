@@ -90,7 +90,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 
 	clientEvent, err := event.NewClientCreatedEvent(client)
 	if err != nil {
-		log.Error(sharedExceptions.LogEventCreationError())
+		log.Error(sharedExceptions.LogEventCreationError(), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
 	if err = h.deps.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
@@ -100,7 +100,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 
 	outboxEvent, err := outbox.NewOutboxEvent(clientEvent)
 	if err != nil {
-		log.Error(sharedExceptions.LogOutboxCreationError())
+		log.Error(sharedExceptions.LogOutboxCreationError(), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, err
 	}
 	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {

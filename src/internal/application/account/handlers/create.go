@@ -28,7 +28,10 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 
 	log := h.deps.Logger.With(
 		slog.String("operation", op),
-		slog.String("clientID", c.ClientID),
+		slog.Group("account",
+			slog.String("clientID", c.ClientID),
+			slog.String("currency", c.Currency),
+		),
 	)
 
 	log.Info("Attempting to create new account")
@@ -104,6 +107,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 		return commands.CreateDTO{}, err
 	}
 
+	log.Info("Account creation completed successfully")
 	return commands.CreateDTO{
 		AccountID: accountID.String(),
 	}, nil
