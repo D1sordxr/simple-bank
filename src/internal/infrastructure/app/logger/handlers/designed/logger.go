@@ -56,21 +56,18 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		level = color.RedString(level)
 	}
 
-	fields := make(map[string]interface{}, r.NumAttrs())
-
+	fields := make(map[string]interface{})
 	r.Attrs(func(a slog.Attr) bool {
-		fields[a.Key] = a.Value.Any()
-
+		h.processAttr(a, fields)
 		return true
 	})
 
 	for _, a := range h.attrs {
-		fields[a.Key] = a.Value.Any()
+		h.processAttr(a, fields)
 	}
 
 	var b []byte
 	var err error
-
 	if len(fields) > 0 {
 		b, err = json.MarshalIndent(fields, "", "  ")
 		if err != nil {
@@ -89,6 +86,18 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	)
 
 	return nil
+}
+
+func (h *PrettyHandler) processAttr(attr slog.Attr, fields map[string]interface{}) {
+	if attr.Value.Kind() == slog.KindGroup {
+		groupFields := make(map[string]interface{})
+		for _, g := range attr.Value.Group() {
+			h.processAttr(g, groupFields)
+		}
+		fields[attr.Key] = groupFields
+	} else {
+		fields[attr.Key] = attr.Value.Any()
+	}
 }
 
 func (h *PrettyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {

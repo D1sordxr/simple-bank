@@ -1,8 +1,9 @@
-package handlers
+package tests
 
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/account/handlers"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
@@ -32,7 +33,8 @@ func TestSuccessGetByIDAccountHandler(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}, nil)
 
-	getByIDAccount := NewGetByIDAccountHandler(mockRepo, &mocks.TestUoWManager{})
+	deps := new(commands.Dependencies)
+	getByIDAccount := handlers.NewGetByIDAccountHandler(deps)
 
 	response, err := getByIDAccount.Handle(ctx, command)
 	if err != nil {
