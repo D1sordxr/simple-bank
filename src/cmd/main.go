@@ -86,7 +86,8 @@ func main() {
 	createTransactionCommand := loadTransactionCommands.NewCreateTransactionHandler(transactionDependencies)
 	transactionService := loadTransactionService.NewTransactionService(createTransactionCommand)
 
-	applicationServices := loadApplicationServices.NewApplicationServices(
+	// := applicationServices
+	_ = loadApplicationServices.NewApplicationServices(
 		clientService,      // client commands service
 		accountService,     // account commands service
 		transactionService, // transaction commands service

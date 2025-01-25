@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "./services";
+
+// proto gen cmd: protoc --go_out=. --go-grpc_out=. --proto_path=. client.proto
+
+message Phone {
+  int32 country = 1;
+  int32 code = 2;
+  int32 number = 3;
+}
+
+message CreateClientRequest {
+  string firstName = 1;
+  string lastName = 2;
+  string middleName = 3;
+  string email = 4;
+  repeated Phone phones = 5;
+  string status = 6;
+}
+
+message CreateClientResponse {
+  string id = 1;
+  string eventID = 2;
+}
+
+service ClientService {
+  rpc CreateCustomer(CreateClientRequest) returns (CreateClientResponse);
+}
+
