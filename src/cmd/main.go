@@ -21,6 +21,8 @@ import (
 	loadPostgresOutboxRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/shared/outbox"
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/transaction"
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
+	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc"
+	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/client"
 )
 
 // TODO: Presentation (grpc) layer - client, account, transaction
@@ -86,12 +88,23 @@ func main() {
 	createTransactionCommand := loadTransactionCommands.NewCreateTransactionHandler(transactionDependencies)
 	transactionService := loadTransactionService.NewTransactionService(createTransactionCommand)
 
-	// := applicationServices
-	_ = loadApplicationServices.NewApplicationServices(
+	applicationServices := loadApplicationServices.NewApplicationServices(
 		clientService,      // client commands service
 		accountService,     // account commands service
 		transactionService, // transaction commands service
 	)
+
+	grpcClientService := client.NewClientGrpcService(applicationServices.ClientService)
+	// TODO: grpcAccountService := account.NewAccountGrpcService(applicationServices.AccountService)
+	// TODO: grpcTransactionService := transaction.NewTransactionGrpcService(applicationServices.TransactionService)
+
+	grpcServices := grpc.NewGrpcServices(
+		grpcClientService,
+		// TODO: grpcAccountService,
+		// TODO: grpcTransactionService,
+	)
+
+	_ = grpcServices
 
 	// TODO: gRPC := NewGRPCServer()
 

@@ -1,15 +1,15 @@
 package grpc
 
-import services "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/pb"
+import "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
 
 type Services struct {
-	cs *services.ClientServiceClient
+	cs services.ClientServiceServer
 	// as *pkg.AccountServiceClient
 	// ts *pkg.TransactionServiceClient
 }
 
-func NewGRPCServices(
-	cs *services.ClientServiceClient,
+func NewGrpcServices(
+	cs services.ClientServiceServer,
 	// as *pkg.AccountServiceClient,
 	// ts *pkg.TransactionServiceClient,
 ) *Services {

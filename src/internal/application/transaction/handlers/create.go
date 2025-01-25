@@ -82,7 +82,7 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 	}
 
 	uow := h.deps.UoWManager.GetUoW()
-	tx, err := uow.Begin()
+	tx, err := uow.BeginSerializableTx()
 	if err != nil {
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, err
