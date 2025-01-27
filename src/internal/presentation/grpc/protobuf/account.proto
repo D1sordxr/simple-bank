@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "./services";
+
+// proto gen cmd: protoc --go_out=. --go-grpc_out=. --proto_path=. account.proto
+
+message CreateAccountRequest {
+  string clientID = 1;
+  string currency = 2;
+}
+
+message CreateAccountResponse {
+  string id = 1;
+  string eventID = 2;
+}
+
+service ClientService {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+}
+

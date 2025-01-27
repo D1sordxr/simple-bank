@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "./services";
+
+// proto gen cmd: protoc --go_out=. --go-grpc_out=. --proto_path=. transaction.proto
+
+message CreateTransactionRequest {
+  string sourceAccountID = 1;
+  string destinationAccountID = 2;
+  string currency = 3;
+  float amount = 4;
+  string type = 5;
+  string description = 6;
+}
+
+message CreateTransactionResponse {
+  string id = 1;
+  string eventID = 2;
+}
+
+service TransactionService {
+  rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
+}
+

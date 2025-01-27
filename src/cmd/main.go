@@ -25,6 +25,7 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/client"
 )
 
+// TODO: Transaction - application unit tests for different transaction types
 // TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: App - run app
 

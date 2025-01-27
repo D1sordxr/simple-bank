@@ -25,6 +25,6 @@ message CreateClientResponse {
 }
 
 service ClientService {
-  rpc CreateCustomer(CreateClientRequest) returns (CreateClientResponse);
+  rpc CreateClient(CreateClientRequest) returns (CreateClientResponse);
 }
 
