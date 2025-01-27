@@ -1,7 +1,7 @@
 app:
   mode: "local"
 
-storage: # DSN: host=localhost user=postgres password=rootroot dbname=BankApp port=5433 sslmode=disable
+storage:
   host: "localhost"
   user: "postgres"
   password: "rootroot"
@@ -11,4 +11,7 @@ storage: # DSN: host=localhost user=postgres password=rootroot dbname=BankApp po
 
 grpc:
   port: 44044
-  timeout: 10h # no more than 5s if prod
+  timeout: 5s
+  time: 15min
+  max_connection_idle: 5min
+  max_connection_age: 5min

@@ -1,13 +1,13 @@
-package grpc
+package handlers
 
 import (
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
 )
 
 type Services struct {
-	cs services.ClientServiceServer
-	as services.AccountServiceServer
-	ts services.TransactionServiceServer
+	ClientService      services.ClientServiceServer
+	AccountService     services.AccountServiceServer
+	TransactionService services.TransactionServiceServer
 }
 
 func NewGrpcServices(
@@ -16,8 +16,8 @@ func NewGrpcServices(
 	ts services.TransactionServiceServer,
 ) *Services {
 	return &Services{
-		cs: cs,
-		as: as,
-		ts: ts,
+		ClientService:      cs,
+		AccountService:     as,
+		TransactionService: ts,
 	}
 }

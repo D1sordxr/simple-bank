@@ -21,15 +21,17 @@ import (
 	loadPostgresOutboxRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/shared/outbox"
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/transaction"
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/account"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/client"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
+	loadApp "github.com/D1sordxr/simple-banking-system/internal/presentation"
+	loadGrpcServer "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc"
+	loadGrpcServices "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers"
+	loadAccountGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/account"
+	loadClientGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/client"
+	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: Transaction - application unit tests for different transaction types
+// TODO: Grpc - Run() and Down() methods
 // TODO: Presentation (grpc) layer - client, account, transaction
-// TODO: App - run app
+// TODO: Transaction - application unit tests for different transaction types
 
 // TODO: Redis for caching client and account data
 // TODO: Outbox reader and Kafka producer service
@@ -97,20 +99,19 @@ func main() {
 		transactionService, // transaction commands service
 	)
 
-	grpcClientService := client.NewClientGrpcService(applicationServices.ClientService)
-	grpcAccountService := account.NewAccountGrpcService(applicationServices.AccountService)
-	grpcTransactionService := transaction.NewTransactionGrpcService(applicationServices.TransactionService)
+	grpcClientService := loadClientGrpcService.NewClientGrpcService(applicationServices.ClientService)
+	grpcAccountService := loadAccountGrpcService.NewAccountGrpcService(applicationServices.AccountService)
+	grpcTransactionService := loadTxGrpcService.NewTransactionGrpcService(applicationServices.TransactionService)
 
-	grpcServices := grpc.NewGrpcServices(
+	grpcServices := loadGrpcServices.NewGrpcServices(
 		grpcClientService,      // client grpc service implementation
 		grpcAccountService,     // account grpc service implementation
 		grpcTransactionService, // transaction grpc service implementation
 	)
 
-	_ = grpcServices
+	grpcServer := loadGrpcServer.NewGrpcServer(&cfg.GrpcConfig, grpcServices)
 
-	// TODO: gRPC := NewGRPCServer()
+	app := loadApp.NewApp(grpcServer)
 
-	// TODO: app := NewApp()
-	// TODO: app.Run()
+	app.RunApp()
 }
