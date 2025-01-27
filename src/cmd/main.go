@@ -22,7 +22,9 @@ import (
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/transaction"
 	loadPostgresUoW "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/uow"
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc"
+	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/account"
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/client"
+	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
 // TODO: Transaction - application unit tests for different transaction types
@@ -96,13 +98,13 @@ func main() {
 	)
 
 	grpcClientService := client.NewClientGrpcService(applicationServices.ClientService)
-	// TODO: grpcAccountService := account.NewAccountGrpcService(applicationServices.AccountService)
-	// TODO: grpcTransactionService := transaction.NewTransactionGrpcService(applicationServices.TransactionService)
+	grpcAccountService := account.NewAccountGrpcService(applicationServices.AccountService)
+	grpcTransactionService := transaction.NewTransactionGrpcService(applicationServices.TransactionService)
 
 	grpcServices := grpc.NewGrpcServices(
-		grpcClientService,
-		// TODO: grpcAccountService,
-		// TODO: grpcTransactionService,
+		grpcClientService,      // client grpc service implementation
+		grpcAccountService,     // account grpc service implementation
+		grpcTransactionService, // transaction grpc service implementation
 	)
 
 	_ = grpcServices

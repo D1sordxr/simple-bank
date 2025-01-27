@@ -16,9 +16,9 @@ func NewClientGrpcService(s *client.Service) *GrpcService {
 	return &GrpcService{s: s}
 }
 
-func (s *GrpcService) CreateCustomer(ctx context.Context, in *services.CreateClientRequest) (*services.CreateClientResponse, error) {
+func (s *GrpcService) CreateClient(ctx context.Context, in *services.CreateClientRequest) (*services.CreateClientResponse, error) {
 
-	// TODO: implement
+	// TODO: ...
 
 	var command commands.CreateClientCommand
 
@@ -26,7 +26,7 @@ func (s *GrpcService) CreateCustomer(ctx context.Context, in *services.CreateCli
 	if err != nil {
 		return nil, err
 	}
-
+	
 	return &services.CreateClientResponse{
 		Id: response.ClientID,
 	}, nil

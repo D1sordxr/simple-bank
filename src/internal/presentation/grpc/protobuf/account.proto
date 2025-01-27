@@ -14,7 +14,7 @@ message CreateAccountResponse {
   string eventID = 2;
 }
 
-service ClientService {
+service AccountService {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
 }
 
