@@ -30,7 +30,6 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: Logger - add interface and remove slog from application
 // TODO: GrpcServer - Run() and Down() methods
 // TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: Transaction - application unit tests for different transaction types
