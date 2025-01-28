@@ -30,7 +30,6 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: GrpcServer - Run() and Down() methods
 // TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: Transaction - application unit tests for different transaction types
 
@@ -111,7 +110,7 @@ func main() {
 		grpcTransactionService, // transaction grpc service implementation
 	)
 
-	grpcServer := loadGrpcServer.NewGrpcServer(&cfg.GrpcConfig, grpcServices)
+	grpcServer := loadGrpcServer.NewGrpcServer(&cfg.GrpcConfig, logger, grpcServices)
 
 	app := loadApp.NewApp(grpcServer)
 
