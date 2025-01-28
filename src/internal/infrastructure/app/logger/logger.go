@@ -1,39 +1,37 @@
 package logger
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger/handlers/designed"
 	"log/slog"
-	"os"
-)
-
-const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
 )
 
 type Logger struct {
 	*slog.Logger
 }
 
-func NewSlogLogger(config *app.Config) *Logger {
-	var logger *slog.Logger
-	var handler slog.Handler
+func NewLogger(logger *slog.Logger) *Logger {
+	return &Logger{Logger: logger}
+}
 
-	switch config.AppConfig.Mode {
-	case envLocal:
-		logger = designed.NewPrettySlog()
-		return &Logger{logger}
-	case envDev:
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
-	case envProd:
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
-	default:
-		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
-	}
+func (l *Logger) Info(msg string, attrs ...any) {
+	l.Info(msg, attrs...)
+}
 
-	logger = slog.New(handler)
+func (l *Logger) Error(msg string, attrs ...any) {
+	l.Error(msg, attrs...)
+}
 
-	return &Logger{logger}
+func (l *Logger) Debug(msg string, attrs ...any) {
+	l.Debug(msg, attrs...)
+}
+
+func (l *Logger) String(key string, value string) slog.Attr {
+	return slog.String(key, value)
+}
+
+func (l *Logger) Float64(key string, v float64) slog.Attr {
+	return slog.Float64(key, v)
+}
+
+func (l *Logger) Group(key string, args ...any) slog.Attr {
+	return slog.Group(key, args...)
 }

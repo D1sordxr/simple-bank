@@ -9,7 +9,6 @@ import (
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
 	transactionRoot "github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
-	"log/slog"
 )
 
 type CreateTransactionHandler struct {
@@ -24,14 +23,15 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 	c commands.CreateTransactionCommand) (commands.CreateTransactionDTO, error) {
 	const op = "Services.TransactionService.CreateTransaction"
 
-	log := h.deps.Logger.With(
-		slog.String("operation", op),
-		slog.Group("transaction",
-			slog.String("type", c.Type),
-			slog.String("sourceAccountID", c.SourceAccountID),
-			slog.String("destinationAccountID", c.DestinationAccountID),
-			slog.String("currency", c.Currency),
-			slog.Float64("amount", c.Amount),
+	logger := h.deps.Logger
+	log := logger.With(
+		logger.String("operation", op),
+		logger.Group("transaction",
+			logger.String("type", c.Type),
+			logger.String("sourceAccountID", c.SourceAccountID),
+			logger.String("destinationAccountID", c.DestinationAccountID),
+			logger.String("currency", c.Currency),
+			logger.Float64("amount", c.Amount),
 		),
 	)
 

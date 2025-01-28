@@ -14,6 +14,7 @@ import (
 	loadStorage "github.com/D1sordxr/simple-banking-system/internal/infrastructure"
 	loadConfig "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app"
 	loadLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
+	loadSlogLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger/handlers"
 	loadPostgresConnection "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
 	loadPostgresAccountRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/account"
 	loadPostgresClientRepo "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/repositories/client"
@@ -29,6 +30,7 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
+// TODO: Logger - add interface and remove slog from application
 // TODO: GrpcServer - Run() and Down() methods
 // TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: Transaction - application unit tests for different transaction types
@@ -40,7 +42,8 @@ import (
 func main() {
 	cfg := loadConfig.NewConfig()
 
-	logger := loadLogger.NewSlogLogger(cfg)
+	slogLogger := loadSlogLogger.NewSlogLogger(cfg)
+	logger := loadLogger.NewLogger(slogLogger)
 
 	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
 

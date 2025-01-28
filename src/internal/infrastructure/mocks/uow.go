@@ -24,6 +24,14 @@ func (t *TestUoW) Rollback() error {
 	_ = ctx
 	return nil
 }
+func (t *TestUoW) BeginSerializableTxWithRetry() (interface{}, error) {
+	_ = ctx
+	return nil, nil
+}
+func (t *TestUoW) BeginSerializableTx() (interface{}, error) {
+	_ = ctx
+	return nil, nil
+}
 
 type TestUoWManager struct {
 }

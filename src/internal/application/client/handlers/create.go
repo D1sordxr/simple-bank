@@ -10,7 +10,6 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"log/slog"
 )
 
 type CreateClientHandler struct {
@@ -24,9 +23,10 @@ func NewCreateClientHandler(dependencies *commands.Dependencies) *CreateClientHa
 func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClientCommand) (commands.CreateDTO, error) {
 	const op = "Services.ClientService.CreateClient"
 
-	log := h.deps.Logger.With(
-		slog.String("operation", op),
-		slog.String("clientEmail", c.Email),
+	logger := h.deps.Logger
+	log := logger.With(
+		logger.String("operation", op),
+		logger.String("clientEmail", c.Email),
 	)
 
 	log.Info("Attempting to create new client")

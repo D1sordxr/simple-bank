@@ -9,7 +9,6 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
 	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"log/slog"
 )
 
 type CreateAccountHandler struct {
@@ -25,11 +24,12 @@ func NewCreateAccountHandler(dependencies *commands.Dependencies) *CreateAccount
 func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAccountCommand) (commands.CreateDTO, error) {
 	const op = "Services.AccountService.CreateAccount"
 
-	log := h.deps.Logger.With(
-		slog.String("operation", op),
-		slog.Group("account",
-			slog.String("clientID", c.ClientID),
-			slog.String("currency", c.Currency),
+	logger := h.deps.Logger
+	log := logger.With(
+		logger.String("operation", op),
+		logger.Group("account",
+			logger.String("clientID", c.ClientID),
+			logger.String("currency", c.Currency),
 		),
 	)
 
