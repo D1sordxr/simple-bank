@@ -7,7 +7,7 @@ import (
 
 func ConvertAggregateToModel(client client.Aggregate) models.Client {
 	return models.Client{
-		ID:        client.ClientID,
+		ID:        client.ClientID.Value,
 		FullName:  client.FullName.String(),
 		Email:     client.Email.String(),
 		Status:    client.Status.String(),

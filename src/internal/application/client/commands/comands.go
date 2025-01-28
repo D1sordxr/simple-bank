@@ -6,7 +6,6 @@ type CreateClientCommand struct {
 	MiddleName string           `json:"middle_name" binding:"required"`
 	Email      string           `json:"email" binding:"required"`
 	Phones     []map[string]int `json:"phones" binding:"required"`
-	Status     string           `json:"status" binding:"required"`
 }
 
 type UpdateClientCommand struct {

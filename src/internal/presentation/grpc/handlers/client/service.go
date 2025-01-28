@@ -17,16 +17,31 @@ func NewClientGrpcService(s *client.Service) *GrpcService {
 }
 
 func (s *GrpcService) CreateClient(ctx context.Context, in *services.CreateClientRequest) (*services.CreateClientResponse, error) {
+	phones := make([]map[string]int, 0, len(in.Phones))
 
-	// TODO: ...
+	for _, data := range in.Phones {
+		phone := map[string]int{
+			"country": int(data.Country),
+			"code":    int(data.Code),
+			"number":  int(data.Number),
+		}
 
-	var command commands.CreateClientCommand
+		phones = append(phones, phone)
+	}
+
+	command := commands.CreateClientCommand{
+		FirstName:  in.FirstName,
+		LastName:   in.LastName,
+		MiddleName: in.MiddleName,
+		Email:      in.Email,
+		Phones:     phones,
+	}
 
 	response, err := s.s.CreateClientHandler.Handle(ctx, command)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &services.CreateClientResponse{
 		Id: response.ClientID,
 	}, nil

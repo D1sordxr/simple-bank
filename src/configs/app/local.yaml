@@ -12,6 +12,6 @@ storage:
 grpc:
   port: 44044
   timeout: 5s
-  time: 15min
-  max_connection_idle: 5min
-  max_connection_age: 5min
+  time: 15m
+  max_connection_idle: 5m
+  max_connection_age: 5m
