@@ -66,25 +66,27 @@ func (s *Server) Run() {
 
 func (s *Server) RunGrpcServer() error {
 	const op = "grpcServer.Run"
-	port := s.Config.Port
 
 	s.registerServices()
-	l, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Config.Port))
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
+
+	s.Logger.Info("GRPC server successfully started", s.Logger.String("port", fmt.Sprintf(":%d", s.Config.Port)))
 
 	err = s.Server.Serve(l)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	s.Logger.Info("GRPC server successfully started")
 	return nil
 }
 
 func (s *Server) Down() {
+	s.Logger.Info("Shutting down GRPC server...")
 	s.Server.GracefulStop()
+	s.Logger.Info("GRPC server stopped successfully")
 }
 
 func (s *Server) registerServices() {
@@ -93,4 +95,5 @@ func (s *Server) registerServices() {
 	pbServices.RegisterTransactionServiceServer(s.Server, s.GrpcServices.TransactionService)
 
 	reflection.Register(s.Server)
+	s.Logger.Info("gRPC services registered successfully")
 }
