@@ -57,7 +57,11 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 		return commands.CreateTransactionDTO{}, err
 	}
 
-	money := sharedVO.NewMoneyFromFloat(c.Amount)
+	money, err := sharedVO.NewMoneyFromFloat(c.Amount)
+	if err != nil {
+		log.Error(sharedExc.LogVOCreationError("money"), sharedExc.LogError(err))
+		return commands.CreateTransactionDTO{}, err
+	}
 
 	txStatus := vo.NewTransactionStatus()
 

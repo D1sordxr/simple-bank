@@ -30,7 +30,6 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: Presentation (grpc) layer - client, account, transaction
 // TODO: Transaction - application unit tests for different transaction types
 
 // TODO: Redis for caching client and account data
