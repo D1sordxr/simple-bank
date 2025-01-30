@@ -1,9 +1,5 @@
 package presentation
 
-type Server interface {
-	Run()
-}
-
 type App struct {
 	Server
 }
@@ -14,4 +10,8 @@ func NewApp(s Server) *App {
 
 func (a *App) RunApp() {
 	a.Server.Run()
+}
+
+type Server interface {
+	Run()
 }

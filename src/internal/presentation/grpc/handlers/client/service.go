@@ -16,6 +16,8 @@ func NewClientGrpcService(s *client.Service) *GrpcService {
 	return &GrpcService{s: s}
 }
 
+// TODO: add event id returning in commands layer
+
 func (s *GrpcService) CreateClient(ctx context.Context, in *services.CreateClientRequest) (*services.CreateClientResponse, error) {
 	phones := make([]map[string]int, 0, len(in.Phones))
 
@@ -43,7 +45,8 @@ func (s *GrpcService) CreateClient(ctx context.Context, in *services.CreateClien
 	}
 
 	return &services.CreateClientResponse{
-		Id: response.ClientID,
+		Id:      response.ClientID,
+		EventID: "nil",
 	}, nil
 }
 

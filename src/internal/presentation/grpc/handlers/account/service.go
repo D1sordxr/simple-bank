@@ -2,8 +2,8 @@ package account
 
 import (
 	"context"
-	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account"
+	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
 )
 
@@ -16,9 +16,21 @@ func NewAccountGrpcService(s *account.Service) *GrpcService {
 	return &GrpcService{s: s}
 }
 
-func (s *GrpcService) CreateAccount(context.Context, *services.CreateAccountRequest) (*services.CreateAccountResponse, error) {
+// TODO: add event id returning in commands layer
 
-	// TODO: ...
+func (s *GrpcService) CreateAccount(ctx context.Context, req *services.CreateAccountRequest) (*services.CreateAccountResponse, error) {
+	command := commands.CreateAccountCommand{
+		ClientID: req.ClientID,
+		Currency: req.Currency,
+	}
 
-	return nil, fmt.Errorf("not implemented")
+	response, err := s.s.CreateAccountHandler.Handle(ctx, command)
+	if err != nil {
+		return nil, err
+	}
+
+	return &services.CreateAccountResponse{
+		Id:      response.AccountID,
+		EventID: "nil",
+	}, nil
 }

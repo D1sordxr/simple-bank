@@ -2,8 +2,8 @@ package transaction
 
 import (
 	"context"
-	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction"
+	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
 	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
 )
 
@@ -16,9 +16,25 @@ func NewTransactionGrpcService(s *transaction.Service) *GrpcService {
 	return &GrpcService{s: s}
 }
 
-func (s *GrpcService) CreateTransaction(context.Context, *services.CreateTransactionRequest) (*services.CreateTransactionResponse, error) {
+// TODO: add event id returning in commands layer
 
-	// TODO: ...
+func (s *GrpcService) CreateTransaction(ctx context.Context, req *services.CreateTransactionRequest) (*services.CreateTransactionResponse, error) {
+	command := commands.CreateTransactionCommand{
+		SourceAccountID:      req.SourceAccountID,
+		DestinationAccountID: req.DestinationAccountID,
+		Currency:             req.Currency,
+		Amount:               float64(req.Amount),
+		Type:                 req.Type,
+		Description:          req.Description,
+	}
 
-	return nil, fmt.Errorf("not implemented")
+	response, err := s.s.CreateTransactionHandler.Handle(ctx, command)
+	if err != nil {
+		return nil, err
+	}
+
+	return &services.CreateTransactionResponse{
+		Id:      response.TransactionID,
+		EventID: "nil",
+	}, nil
 }

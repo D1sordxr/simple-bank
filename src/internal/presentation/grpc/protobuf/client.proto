@@ -16,7 +16,6 @@ message CreateClientRequest {
   string middleName = 3;
   string email = 4;
   repeated Phone phones = 5;
-  string status = 6;
 }
 
 message CreateClientResponse {
