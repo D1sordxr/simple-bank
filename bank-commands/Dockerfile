@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang:1.23 AS builder
 
 WORKDIR /app
 
@@ -11,10 +11,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o bank-commands ./cmd/main.go
 
 FROM alpine:latest
 
-WORKDIR /root/
+WORKDIR /app
 
 COPY --from=builder /app/bank-commands .
 
-COPY configs/app/local.yaml /config.yaml
+COPY configs/app /app/configs/app
 
-CMD ["./bank-commands", "-config", "/config.yaml"]
+CMD ["./bank-commands", "-config", "/app/configs/app/local.yaml"]

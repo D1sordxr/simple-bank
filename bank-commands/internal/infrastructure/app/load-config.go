@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"os"
 )
 
 const (
@@ -11,7 +12,12 @@ const (
 func NewConfig() *Config {
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(BasicConfigPath, &cfg); err != nil {
+	path := os.Getenv("CONFIG_PATH")
+	if path == "" {
+		path = BasicConfigPath
+	}
+
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("failed to read config: " + err.Error())
 	}
 

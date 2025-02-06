@@ -13,15 +13,15 @@ func NewLogger(logger *slog.Logger) *Logger {
 }
 
 func (l *Logger) Info(msg string, attrs ...any) {
-	l.Info(msg, attrs...)
+	l.Logger.Info(msg, attrs...)
 }
 
 func (l *Logger) Error(msg string, attrs ...any) {
-	l.Error(msg, attrs...)
+	l.Logger.Error(msg, attrs...)
 }
 
 func (l *Logger) Debug(msg string, attrs ...any) {
-	l.Debug(msg, attrs...)
+	l.Logger.Debug(msg, attrs...)
 }
 
 func (l *Logger) String(key string, value string) slog.Attr {

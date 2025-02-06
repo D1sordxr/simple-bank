@@ -2,10 +2,10 @@ app:
   mode: "local"
 
 storage:
-  host: "localhost"
+  host: "postgres"
   user: "postgres"
   password: "rootroot"
-  port: 5433
+  port: 5432
   database: "BankApp"
   migration: true
 
