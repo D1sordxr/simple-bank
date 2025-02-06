@@ -30,7 +30,7 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: Transaction - application unit tests for different transaction types
+// TODO: Transaction - add reversal type support
 
 // TODO: Redis for caching client and account data
 // TODO: Outbox reader and Kafka producer service

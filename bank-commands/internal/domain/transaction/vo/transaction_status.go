@@ -5,17 +5,19 @@ import (
 )
 
 const (
-	StatusInitiated = "initiated"
-	StatusCompleted = "completed"
-	StatusFailed    = "failed"
-	StatusCanceled  = "canceled"
+	StatusRegistered = "registered"
+	StatusAuthorized = "authorized"
+	StatusCompleted  = "completed"
+	StatusFailed     = "failed"
+	StatusCanceled   = "canceled"
 )
 
 var validStatuses = map[string]bool{
-	StatusInitiated: true,
-	StatusCompleted: true,
-	StatusFailed:    true,
-	StatusCanceled:  true,
+	StatusRegistered: true,
+	StatusAuthorized: true,
+	StatusCompleted:  true,
+	StatusFailed:     true,
+	StatusCanceled:   true,
 }
 
 type TransactionStatus struct {
@@ -23,7 +25,7 @@ type TransactionStatus struct {
 }
 
 func NewTransactionStatus() TransactionStatus {
-	return TransactionStatus{Status: StatusInitiated}
+	return TransactionStatus{Status: StatusRegistered}
 }
 
 // NewTransactionStatusWithValue creates a new TransactionStatus with the given value.
@@ -49,16 +51,22 @@ func (ts *TransactionStatus) IsCanceled() bool {
 	return ts.Status == StatusCanceled
 }
 
+// IsAuthorized checks if the current status is "authorized".
+func (ts *TransactionStatus) IsAuthorized() bool {
+	return ts.Status == StatusAuthorized
+}
+
+// IsRegistered checks if the current status is "registered".
+func (ts *TransactionStatus) IsRegistered() bool {
+	return ts.Status == StatusRegistered
+}
+
 // UpdateStatus safely updates the transaction status.
 func (ts *TransactionStatus) UpdateStatus(newStatus string) error {
 	if !isValidStatus(newStatus) {
 		return exceptions.InvalidTxStatus
 	}
 
-	// Example: add rules for allowed transitions
-	if ts.Status == StatusCompleted {
-		return exceptions.FailedToUpdateStatus
-	}
 	ts.Status = newStatus
 	return nil
 }
@@ -75,5 +83,5 @@ func isValidStatus(status string) bool {
 
 // AllowedStatuses returns a list of all valid transaction statuses.
 func AllowedStatuses() []string {
-	return []string{StatusInitiated, StatusCompleted, StatusFailed, StatusCanceled}
+	return []string{StatusRegistered, StatusAuthorized, StatusCompleted, StatusFailed, StatusCanceled}
 }

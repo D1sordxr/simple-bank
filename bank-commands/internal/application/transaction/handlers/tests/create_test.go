@@ -89,3 +89,102 @@ func TestSuccessCreateTransactionHandlerWithWithdrawalType(t *testing.T) {
 		t.Error("expected non-empty transaction ID")
 	}
 }
+
+func FuzzCreateTransactionHandler(f *testing.F) {
+	seedCorpus := []commands.CreateTransactionCommand{
+		{ // Transfer
+			SourceAccountID:      uuid.NewString(),
+			DestinationAccountID: uuid.NewString(),
+			Currency:             "RUB",
+			Amount:               100,
+			Type:                 transferType,
+			Description:          "valid transfer",
+		},
+		{ // Deposit
+			DestinationAccountID: uuid.NewString(),
+			Currency:             "USD",
+			Amount:               50,
+			Type:                 depositType,
+			Description:          "valid deposit",
+		},
+		{ // Withdrawal
+			SourceAccountID: uuid.NewString(),
+			Currency:        "EUR",
+			Amount:          75,
+			Type:            withdrawalType,
+			Description:     "valid withdrawal",
+		},
+	}
+
+	for _, cmd := range seedCorpus {
+		f.Add(
+			cmd.SourceAccountID,
+			cmd.DestinationAccountID,
+			cmd.Currency,
+			cmd.Amount,
+			cmd.Type,
+			cmd.Description,
+		)
+	}
+
+	f.Fuzz(func(t *testing.T,
+		sourceID string,
+		destID string,
+		currency string,
+		amount float64,
+		txType string,
+		description string,
+	) {
+		ctx := context.Background()
+		mockDeps := mockClientDeps()
+		handler := handlers.NewCreateTransactionHandler(mockDeps)
+
+		cmd := commands.CreateTransactionCommand{
+			SourceAccountID:      sourceID,
+			DestinationAccountID: destID,
+			Currency:             currency,
+			Amount:               amount,
+			Type:                 txType,
+			Description:          description,
+		}
+
+		response, err := handler.Handle(ctx, cmd)
+
+		switch cmd.Type {
+		case transferType:
+			if cmd.SourceAccountID == "" || cmd.DestinationAccountID == "" {
+				if err == nil {
+					t.Error("expected error for missing accounts in transfer")
+				}
+				return
+			}
+		case depositType:
+			if cmd.DestinationAccountID == "" {
+				if err == nil {
+					t.Error("expected error for missing destination in deposit")
+				}
+				return
+			}
+		case withdrawalType:
+			if cmd.SourceAccountID == "" {
+				if err == nil {
+					t.Error("expected error for missing source in withdrawal")
+				}
+				return
+			}
+		default:
+			if err == nil {
+				t.Error("expected error for unknown transaction type")
+			}
+			return
+		}
+
+		if err == nil {
+			if response.TransactionID == "" {
+				t.Error("expected non-empty transaction ID")
+			}
+		} else {
+			t.Logf("expected error: %v", err)
+		}
+	})
+}
