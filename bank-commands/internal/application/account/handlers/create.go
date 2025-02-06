@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
@@ -38,7 +39,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 	clientID, err := sharedVO.NewUUIDFromString(c.ClientID)
 	if err != nil {
 		log.Error(sharedExceptions.LogVOCreationError("UUID"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	accountID := sharedVO.NewUUID()
@@ -48,7 +49,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 	currency, err := sharedVO.NewCurrency(c.Currency)
 	if err != nil {
 		log.Error(sharedExceptions.LogVOCreationError("currency"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	status := vo.NewStatus()
@@ -56,14 +57,14 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency, status)
 	if err != nil {
 		log.Error(sharedExceptions.LogAggregateCreationError("account"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	uow := h.deps.UoWManager.GetUoW()
 	tx, err := uow.Begin()
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	defer func() {
 		if r := recover(); r != nil {
@@ -78,32 +79,32 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 
 	if err = h.deps.AccountRepository.Create(ctx, tx, account); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	accountEvent, err := event.NewAccountCreatedEvent(account)
 	if err != nil {
 		log.Error(sharedExceptions.LogEventCreationError(), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	if err = h.deps.EventRepository.SaveEvent(ctx, tx, accountEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	outboxEvent, err := outbox.NewOutboxEvent(accountEvent)
 	if err != nil {
 		log.Error(sharedExceptions.LogOutboxCreationError(), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = uow.Commit(); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("Account creation completed successfully")

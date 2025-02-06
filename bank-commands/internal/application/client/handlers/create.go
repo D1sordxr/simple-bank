@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
 	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
@@ -36,39 +37,39 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	fullName, err := vo.NewFullName(c.FirstName, c.MiddleName, c.LastName)
 	if err != nil {
 		log.Error(sharedExceptions.LogVOCreationError("fullName"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	email, err := vo.NewEmail(c.Email)
 	if err != nil {
 		log.Error(sharedExceptions.LogVOCreationError("email"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	phones, err := entity.NewPhones(c.Phones, clientID.Value)
 	if err != nil {
 		log.Error(sharedExceptions.LogEntityCreationError("phones"), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	status := vo.NewStatus()
 
 	err = h.deps.ClientRepository.Exists(ctx, email.Email)
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	client, err := clientRoot.NewClient(clientID, fullName, email, phones, status)
 	if err != nil {
 		log.Error(sharedExceptions.LogAggregateCreationError("client"))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	uow := h.deps.UoWManager.GetUoW()
 	tx, err := uow.Begin()
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	defer func() {
 		if r := recover(); r != nil {
@@ -84,23 +85,23 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	err = h.deps.ClientRepository.Create(ctx, tx, client)
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	clientEvent, err := event.NewClientCreatedEvent(client)
 	if err != nil {
 		log.Error(sharedExceptions.LogEventCreationError(), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	if err = h.deps.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	outboxEvent, err := outbox.NewOutboxEvent(clientEvent)
 	if err != nil {
 		log.Error(sharedExceptions.LogOutboxCreationError(), sharedExceptions.LogError(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
@@ -108,7 +109,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 
 	if err = uow.Commit(); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
-		return commands.CreateDTO{}, err
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("Client creation completed successfully")
