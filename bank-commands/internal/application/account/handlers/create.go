@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/account/dependencies"
 	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
@@ -13,10 +14,10 @@ import (
 )
 
 type CreateAccountHandler struct {
-	deps *commands.Dependencies
+	deps *dependencies.Dependencies
 }
 
-func NewCreateAccountHandler(dependencies *commands.Dependencies) *CreateAccountHandler {
+func NewCreateAccountHandler(dependencies *dependencies.Dependencies) *CreateAccountHandler {
 	return &CreateAccountHandler{
 		deps: dependencies,
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/dependencies"
 	clientRoot "github.com/D1sordxr/simple-banking-system/internal/domain/client"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
@@ -14,10 +15,10 @@ import (
 )
 
 type CreateClientHandler struct {
-	deps *commands.Dependencies
+	deps *dependencies.Dependencies
 }
 
-func NewCreateClientHandler(dependencies *commands.Dependencies) *CreateClientHandler {
+func NewCreateClientHandler(dependencies *dependencies.Dependencies) *CreateClientHandler {
 	return &CreateClientHandler{deps: dependencies}
 }
 

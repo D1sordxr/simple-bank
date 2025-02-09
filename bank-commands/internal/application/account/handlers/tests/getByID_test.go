@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/account/dependencies"
 	"github.com/D1sordxr/simple-banking-system/internal/application/account/handlers"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
@@ -33,7 +34,7 @@ func TestSuccessGetByIDAccountHandler(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}, nil)
 
-	deps := new(commands.Dependencies)
+	deps := new(dependencies.Dependencies)
 	getByIDAccount := handlers.NewGetByIDAccountHandler(deps)
 
 	response, err := getByIDAccount.Handle(ctx, command)

@@ -3,15 +3,16 @@ package handlers
 import (
 	"context"
 	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/dependencies"
 )
 
 // TODO: UpdateClientHandler
 
 type UpdateClientHandler struct {
-	*commands.Dependencies
+	*dependencies.Dependencies
 }
 
-func NewUpdateClientHandler(dependencies *commands.Dependencies) *UpdateClientHandler {
+func NewUpdateClientHandler(dependencies *dependencies.Dependencies) *UpdateClientHandler {
 	return &UpdateClientHandler{Dependencies: dependencies}
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/dependencies"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
 	sharedExc "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
@@ -15,10 +16,10 @@ import (
 )
 
 type CreateTransactionHandler struct {
-	deps *commands.Dependencies
+	deps *dependencies.Dependencies
 }
 
-func NewCreateTransactionHandler(deps *commands.Dependencies) *CreateTransactionHandler {
+func NewCreateTransactionHandler(deps *dependencies.Dependencies) *CreateTransactionHandler {
 	return &CreateTransactionHandler{deps: deps}
 }
 

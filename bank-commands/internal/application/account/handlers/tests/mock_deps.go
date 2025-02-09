@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/account/dependencies"
 	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
 	loadLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger/handlers/designed"
@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func mockAccountDeps() *commands.Dependencies {
+func mockAccountDeps() *dependencies.Dependencies {
 
 	logger := &loadLogger.Logger{Logger: designed.NewPrettySlog()}
 
@@ -25,7 +25,7 @@ func mockAccountDeps() *commands.Dependencies {
 	mockOutboxRepo := new(mocks.MockOutboxRepository)
 	mockOutboxRepo.On("SaveOutboxEvent", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-	return &commands.Dependencies{
+	return &dependencies.Dependencies{
 		Logger:            logger,
 		UoWManager:        uow,
 		EventRepository:   mockEventRepo,

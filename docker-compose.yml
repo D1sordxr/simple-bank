@@ -6,75 +6,31 @@ services:
       context: ./bank-commands
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "44044:44044"
     volumes:
-      - ./bank-commands/configs/app/local.yaml:/config.yaml
+      - ./bank-commands/configs/app/local.yaml:/app/configs/app/local.yaml
     environment:
-      CONFIG_PATH: "/config.yaml"
+      CONFIG_PATH: "/app/configs/app/local.yaml"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
-  bank-workers:
-    build:
-      context: ./bank-workers
-      dockerfile: Dockerfile
-    ports:
-      - "8082:8080"
-    volumes:
-      - ./bank-workers/configs/app/local.yaml:/config.yaml
-    environment:
-      CONFIG_PATH: "/config.yaml"
-    depends_on:
-      - kafka
-
-  bank-projector:
-    build:
-      context: ./bank-read-models
-      dockerfile: Dockerfile
-    ports:
-      - "8083:8080"
-    volumes:
-      - ./bank-read-models/configs/app/local.yaml:/config.yaml
-    environment:
-      CONFIG_PATH: "/config.yaml"
-    depends_on:
-      - redis
-
-  bank-api:
-    build:
-      context: ./bank-api
-      dockerfile: Dockerfile
-    ports:
-      - "8084:8080"
-    volumes:
-      - ./bank-api/configs/app/local.yaml:/config.yaml
-    environment:
-      CONFIG_PATH: "/config.yaml"
-    depends_on:
-      - bank-commands
-      - bank-read-models
-
-  redis:
-    image: redis:latest
-    restart: always
-    ports:
-      - "6379:6379"
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
+  postgres:
+    image: postgres:latest
     restart: always
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-    depends_on:
-      - zookeeper
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    restart: always
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rootroot
+      POSTGRES_DB: BankApp
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:

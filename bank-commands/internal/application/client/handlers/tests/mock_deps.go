@@ -1,14 +1,14 @@
 package tests
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
+	"github.com/D1sordxr/simple-banking-system/internal/application/client/dependencies"
 	loadLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger/handlers/designed"
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/mocks"
 	"github.com/stretchr/testify/mock"
 )
 
-func mockClientDeps() *commands.Dependencies {
+func mockClientDeps() *dependencies.Dependencies {
 
 	logger := &loadLogger.Logger{Logger: designed.NewPrettySlog()}
 
@@ -24,7 +24,7 @@ func mockClientDeps() *commands.Dependencies {
 	mockOutboxRepo := new(mocks.MockOutboxRepository)
 	mockOutboxRepo.On("SaveOutboxEvent", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-	return &commands.Dependencies{
+	return &dependencies.Dependencies{
 		Logger:           logger,
 		UoWManager:       uow,
 		EventRepository:  mockEventRepo,
