@@ -16,6 +16,7 @@ type Aggregate struct {
 	Phones    entity.Phones
 	Status    vo.Status
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func NewClient(clientID sharedVO.UUID,
@@ -35,5 +36,6 @@ func NewClient(clientID sharedVO.UUID,
 		Phones:    phones,
 		Status:    status,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}, nil
 }

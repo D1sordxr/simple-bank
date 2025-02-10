@@ -22,17 +22,18 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, account account
 	const op = "postgres.AccountRepository.Create"
 
 	conn := tx.(pgx.Tx)
+
 	accountsQuery := `INSERT INTO accounts (
-                    id, 
-                    client_id, 
-                    available_money,
-                    frozen_money,
-                    currency,
-                    status,
-                    created_at,
-                    updated_at
-                 ) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7);`
+        id, 
+        client_id, 
+        available_money,
+        frozen_money,
+        currency,
+        status,
+        created_at,
+        updated_at
+    ) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
 
 	accountModel := converters.ConvertAggregateToModel(account)
 

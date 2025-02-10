@@ -1,9 +1,10 @@
 CREATE TABLE accounts (
     id UUID PRIMARY KEY,
-    client_id UUID NOT NULL,
-    balance NUMERIC NOT NULL,
+    client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    available_money NUMERIC NOT NULL,
+    frozen_money NUMERIC NOT NULL,
     currency VARCHAR(10) NOT NULL,
-    status VARCHAR(255) NOT NULL,
+    status VARCHAR(25) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

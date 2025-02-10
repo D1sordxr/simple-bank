@@ -5,12 +5,15 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
 )
 
-func ConvertAggregateToModel(client client.Aggregate) models.Client {
+func ConvertAggregateToModel(agg client.Aggregate) models.Client {
 	return models.Client{
-		ID:        client.ClientID.Value,
-		FullName:  client.FullName.String(),
-		Email:     client.Email.String(),
-		Status:    client.Status.String(),
-		CreatedAt: client.CreatedAt,
+		ID:         agg.ClientID.Value,
+		FirstName:  agg.FullName.FirstName,
+		LastName:   agg.FullName.LastName,
+		MiddleName: agg.FullName.MiddleName,
+		Email:      agg.Email.String(),
+		Status:     agg.Status.String(),
+		CreatedAt:  agg.CreatedAt,
+		UpdatedAt:  agg.UpdatedAt,
 	}
 }

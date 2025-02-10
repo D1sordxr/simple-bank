@@ -5,14 +5,12 @@ import (
 	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
 )
 
-func ConvertPhoneEntityToModel(entity entity.Phone) models.Phone {
+func ConvertPhoneEntityToModel(phone entity.Phone) models.Phone {
 	return models.Phone{
-		ID:          entity.PhoneID,
-		ClientID:    entity.ClientID,
-		PhoneNumber: entity.String(),
-		Country:     entity.Country,
-		Code:        entity.Code,
-		Number:      entity.Number,
-		CreatedAt:   entity.CreatedAt,
+		ID:          phone.PhoneID,
+		ClientID:    phone.ClientID,
+		PhoneNumber: phone.String(),
+		CreatedAt:   phone.CreatedAt,
+		UpdatedAt:   phone.UpdatedAt,
 	}
 }

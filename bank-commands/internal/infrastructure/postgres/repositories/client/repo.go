@@ -10,8 +10,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// TODO: implement methods
-
 type Repository struct {
 	Conn *postgres.Connection
 }
@@ -24,47 +22,53 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, client client.A
 	const op = "postgres.ClientRepository.Create"
 
 	conn := tx.(pgx.Tx)
+
 	clientsQuery := `INSERT INTO clients (
-                    id, 
-                    full_name, 
-                    email,
-                    status,
-                    created_at
-                 ) 
-                 VALUES ($1, $2, $3, $4, $5);`
+        id, 
+        first_name, 
+        last_name, 
+        middle_name, 
+        email,
+        status,
+        created_at,
+        updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
 	phonesQuery := `INSERT INTO phones (
-                    id,
-                    client_id,
-                    phone_number,
-                    country,
-                    code,
-                    number,
-                    created_at
-                )
-                VALUES ($1, $2, $3, $4, $5, $6, $7);`
+        id,
+        client_id,
+        phone_number,
+        created_at,
+        updated_at
+    ) VALUES ($1, $2, $3, $4, $5)`
 
 	clientModel := converters.ConvertAggregateToModel(client)
+
 	_, err := conn.Exec(ctx, clientsQuery,
 		clientModel.ID,
-		clientModel.FullName,
+		clientModel.FirstName,
+		clientModel.LastName,
+		clientModel.MiddleName,
 		clientModel.Email,
 		clientModel.Status,
 		clientModel.CreatedAt,
+		clientModel.UpdatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, ErrFailedToCreateClient)
 	}
 
+	// TODO: add batch
+
 	for _, phone := range client.Phones {
 		phoneModel := converters.ConvertPhoneEntityToModel(phone)
+
 		_, err = conn.Exec(ctx, phonesQuery,
 			phoneModel.ID,
 			phoneModel.ClientID,
 			phoneModel.PhoneNumber,
-			phoneModel.Country,
-			phoneModel.Code,
-			phoneModel.Number,
 			phoneModel.CreatedAt,
+			phoneModel.UpdatedAt,
 		)
 		if err != nil {
 			return fmt.Errorf("%s: %w", op, ErrFailedToCreatePhone)

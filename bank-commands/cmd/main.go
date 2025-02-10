@@ -30,11 +30,13 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers/transaction"
 )
 
+// TODO: Outbox and Event - aggregate creation (add timestamps) and fields in postgres migrations
+// TODO: Money - rework float64 -> decimal.Decimal from shopspring library
 // TODO: Transaction - add reversal type support
 
 // TODO: Redis for caching client and account data
 // TODO: Outbox reader and Kafka producer service
-// TODO: Kafka consumer services to process transaction and caching client and account data
+// TODO: Kafka consumer services to process transaction
 
 func main() {
 	cfg := loadConfig.NewConfig()

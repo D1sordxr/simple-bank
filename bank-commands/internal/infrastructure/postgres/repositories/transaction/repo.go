@@ -21,18 +21,20 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
 	const op = "postgres.TransactionRepository.Create"
 
 	conn := tx.(pgx.Tx)
+
 	query := `INSERT INTO transactions (
-                          id, 
-                          source_account_id, 
-                          destination_account_id,
-                          currency,
-                          amount,
-                          status,
-                          type,
-                          description,
-                          created_at
-                          ) 
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
+        id, 
+        source_account_id, 
+        destination_account_id,
+        currency,
+        amount,
+        status,
+        type,
+        description,
+        failure_reason,
+        created_at,
+        updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 
 	model := converter.ConvertAggregateToModel(transaction)
 
@@ -45,7 +47,9 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, transaction tra
 		model.Status,
 		model.Type,
 		model.Description,
+		model.FailureReason,
 		model.CreatedAt,
+		model.UpdatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, ErrFailedToCreateTransaction)

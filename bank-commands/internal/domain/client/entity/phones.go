@@ -14,6 +14,7 @@ type Phone struct {
 	Code      int
 	Number    int
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type Phones []Phone
@@ -44,6 +45,7 @@ func NewPhone(data map[string]int, clientID uuid.UUID) Phone {
 		Code:      data["code"],
 		Number:    data["number"],
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	return phone

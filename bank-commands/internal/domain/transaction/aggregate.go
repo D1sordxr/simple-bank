@@ -17,7 +17,8 @@ type Aggregate struct {
 	Type                 vo.Type              // type: transfer, deposit, withdrawal, reversal
 	Description          *vo.Description      // optional transaction description
 	FailureReason        *string              // reason for failure (nullable)
-	Timestamp            time.Time            // time of transaction initiation
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 func NewTransaction(
@@ -56,6 +57,7 @@ func NewTransaction(
 		Type:                 txType,
 		Description:          description,
 		FailureReason:        nil,
-		Timestamp:            time.Now(),
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
 	}, nil
 }
