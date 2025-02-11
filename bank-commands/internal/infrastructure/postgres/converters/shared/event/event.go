@@ -11,7 +11,7 @@ func ConvertAggregateToModel(event event.Event) models.Event {
 		AggregateID:   event.AggregateID.Value,
 		AggregateType: event.AggregateType.Type,
 		EventType:     event.EventType.Type,
-		Payload:       event.Payload.String(),
+		Payload:       event.Payload.Payload,
 		CreatedAt:     event.CreatedAt,
 	}
 }

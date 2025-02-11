@@ -5,5 +5,5 @@ CREATE TABLE outbox (
     message_type VARCHAR(50) NOT NULL,
     message_payload TEXT NOT NULL,
     status VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

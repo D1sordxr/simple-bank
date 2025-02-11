@@ -11,7 +11,7 @@ func ConvertAggregateToModel(outbox outbox.Outbox) models.Outbox {
 		AggregateID:    outbox.AggregateID.Value,
 		AggregateType:  outbox.AggregateType.Type,
 		MessageType:    outbox.MessageType.Type,
-		MessagePayload: outbox.MessagePayload.String(),
+		MessagePayload: outbox.MessagePayload.Payload,
 		Status:         outbox.Status.Status,
 		CreatedAt:      outbox.CreatedAt,
 	}

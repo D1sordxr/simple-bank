@@ -22,15 +22,14 @@ func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox
 
 	conn := tx.(pgx.Tx)
 	query := `INSERT INTO outbox (
-                          id, 
-                          aggregate_id, 
-                          aggregate_type,
-                          message_type,
-                          message_payload,
-                          status,
-                          created_at
-                          ) 
-				VALUES ($1, $2, $3, $4, $5, $6, $7);`
+        id, 
+        aggregate_id, 
+        aggregate_type,
+        message_type,
+        message_payload,
+        status,
+        created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7);`
 
 	model := outboxConverter.ConvertAggregateToModel(outbox)
 

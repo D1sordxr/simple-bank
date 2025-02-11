@@ -21,14 +21,13 @@ func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.
 	const op = "postgres.EventRepository.SaveEvent"
 	conn := tx.(pgx.Tx)
 	query := `INSERT INTO events (
-                          id, 
-                          aggregate_id, 
-                          aggregate_type,
-                          event_type,
-                          payload,
-                          created_at
-                          ) 
-				VALUES ($1, $2, $3, $4, $5, $6);`
+        id, 
+        aggregate_id, 
+        aggregate_type,
+        event_type,
+        payload,
+        created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6);`
 
 	model := eventConverter.ConvertAggregateToModel(event)
 

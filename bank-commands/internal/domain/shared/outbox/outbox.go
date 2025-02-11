@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// TODO: RetryCount	(int)	number of retries
+// TODO: RetryCount	(int) - number of retries
 
 type Outbox struct {
 	OutboxID       sharedVO.UUID         // Outbox unique ID

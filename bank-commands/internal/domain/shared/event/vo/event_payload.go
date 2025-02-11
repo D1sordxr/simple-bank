@@ -9,7 +9,7 @@ type EventPayload struct {
 	Payload string
 }
 
-func NewEventPayload(data interface{}) (EventPayload, error) {
+func NewEventPayload(data any) (EventPayload, error) {
 	payloadBytes, err := json.Marshal(data)
 	if err != nil {
 		return EventPayload{}, exceptions.MarshalFailed

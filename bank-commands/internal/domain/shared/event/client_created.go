@@ -19,13 +19,12 @@ func NewClientCreatedEvent(client client.Aggregate) (Event, error) {
 	if err != nil {
 		return Event{}, err
 	}
-	creationTime := time.Now()
 	return Event{
 		EventID:       eventID,
 		AggregateID:   aggregateID,
 		AggregateType: aggregateType,
 		EventType:     eventType,
 		Payload:       payload,
-		CreatedAt:     creationTime,
+		CreatedAt:     time.Now(),
 	}, nil
 }
