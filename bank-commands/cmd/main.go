@@ -31,10 +31,12 @@ import (
 )
 
 // TODO: Transaction - add reversal type support
+// TODO: Queries - add application logic and use DAOs
 
-// TODO: Redis for caching client and account data
+// TODO: Workers...
 // TODO: Outbox reader and Kafka producer service
 // TODO: Kafka consumer services to process transaction
+// TODO: Redis for caching client and account data
 
 // TODO: Money - rework float64 -> decimal.Decimal from shopspring library (optional)
 
