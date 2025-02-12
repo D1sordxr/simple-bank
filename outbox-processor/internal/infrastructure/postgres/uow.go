@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/application/persistence"
+	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
 	"github.com/jackc/pgx/v5"
 )
 
