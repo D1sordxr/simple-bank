@@ -2,8 +2,8 @@ package tests
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/handlers"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/handlers"
 	"testing"
 )
 

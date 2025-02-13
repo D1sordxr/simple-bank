@@ -3,9 +3,10 @@ package outbox
 import (
 	"context"
 	"errors"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/queries"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -38,7 +39,8 @@ func (r *Repository) FetchPendingMessages(ctx context.Context, tx interface{}, l
 	}
 	defer rows.Close()
 
-	messages := make([]outbox.Aggregate, 0, limit)
+	messages := make(queries.OutboxDTOs, 0, limit)
+
 	for rows.Next() {
 		var msgModel models.Outbox
 		err = rows.Scan(
@@ -53,7 +55,7 @@ func (r *Repository) FetchPendingMessages(ctx context.Context, tx interface{}, l
 		if err != nil {
 			return nil, RowScanningErr
 		}
-		message := converters.ConvertModelToAggregate(msgModel)
+		message := converters.ConvertModelToDTO(msgModel)
 		messages = append(messages, message)
 	}
 

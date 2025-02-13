@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/queries"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/queries"
 )
 
 type GetByIDAccountQuery interface {

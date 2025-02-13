@@ -2,10 +2,10 @@ package tests
 
 import (
 	"encoding/json"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/vo"
 	"testing"
 	"time"
 )

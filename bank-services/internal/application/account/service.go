@@ -1,7 +1,7 @@
 package account
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/interfaces"
 )
 
 type Service struct {

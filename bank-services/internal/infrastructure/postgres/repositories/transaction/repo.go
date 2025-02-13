@@ -3,9 +3,9 @@ package transaction
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
-	converter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	converter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/transaction"
 	"github.com/jackc/pgx/v5"
 )
 

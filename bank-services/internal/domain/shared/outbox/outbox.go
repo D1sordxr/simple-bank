@@ -1,10 +1,10 @@
 package outbox
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	eventVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/event/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox/vo"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	eventVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event/vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox/vo"
+	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
 	"time"
 )
 

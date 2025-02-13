@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
 	"github.com/stretchr/testify/mock"
 )
 

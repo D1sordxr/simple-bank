@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 )
 
 type Services struct {

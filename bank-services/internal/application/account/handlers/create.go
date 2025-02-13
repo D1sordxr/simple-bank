@@ -3,14 +3,14 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/dependencies"
-	accountRoot "github.com/D1sordxr/simple-banking-system/internal/domain/account"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	sharedExceptions "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/dependencies"
+	accountRoot "github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account/vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	sharedExceptions "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_exceptions"
+	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
 )
 
 type CreateAccountHandler struct {

@@ -1,7 +1,7 @@
 package transaction
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/interfaces"
 )
 
 type Service struct {

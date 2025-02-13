@@ -1,11 +1,12 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/config"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/handlers"
-	pbServices "github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/config"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers"
+	pbServices "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -44,18 +45,26 @@ func (s *Server) Run() {
 	var err error
 	errorsChannel := make(chan error, 1)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	go func() {
 		if err = s.RunGrpcServer(); err != nil {
 			errorsChannel <- err
 		}
 	}()
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		stop := make(chan os.Signal, 1)
+		signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+		<-stop
+		s.Logger.Info("Stop signal received...")
+		cancel()
+	}()
 
 	select {
-	case <-stop:
-		s.Logger.Info("Stopping application...", s.Logger.String("signal", "stop"))
+	case <-ctx.Done():
+		s.Logger.Info("Stopping application...", s.Logger.String("reason", "stop signal"))
 	case err = <-errorsChannel:
 		s.Logger.Error("Application encountered an error", s.Logger.String("error", err.Error()))
 	}

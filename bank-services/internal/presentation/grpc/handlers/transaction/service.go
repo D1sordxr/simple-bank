@@ -2,9 +2,9 @@ package transaction
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/application/transaction/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 )
 
 type GrpcService struct {

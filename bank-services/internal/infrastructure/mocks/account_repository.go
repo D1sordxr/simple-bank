@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )

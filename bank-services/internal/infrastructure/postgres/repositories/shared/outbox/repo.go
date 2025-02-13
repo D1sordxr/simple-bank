@@ -3,9 +3,9 @@ package outbox
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
-	outboxConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	outboxConverter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/shared/outbox"
 	"github.com/jackc/pgx/v5"
 )
 

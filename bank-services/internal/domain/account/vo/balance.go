@@ -1,6 +1,6 @@
 package vo
 
-import "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
+import "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
 
 type Balance struct {
 	AvailableMoney shared_vo.Money

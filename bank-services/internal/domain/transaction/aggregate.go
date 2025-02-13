@@ -1,9 +1,9 @@
 package transaction
 
 import (
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/exceptions"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/vo"
+	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/exceptions"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/vo"
 	"time"
 )
 

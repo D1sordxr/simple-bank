@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/shared/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
 )
 
 var (

@@ -1,4 +1,4 @@
-module github.com/D1sordxr/simple-banking-system
+module github.com/D1sordxr/simple-bank/bank-services
 
 go 1.23rc2
 

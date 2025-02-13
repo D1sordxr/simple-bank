@@ -1,12 +1,12 @@
 package converters
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/queries"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 )
 
-func ConvertModelToAggregate(model models.Outbox) outbox.Aggregate {
-	return outbox.Aggregate{
+func ConvertModelToDTO(model models.Outbox) queries.OutboxDTO {
+	return queries.OutboxDTO{
 		OutboxID:       model.ID.String(),
 		AggregateID:    model.AggregateID.String(),
 		AggregateType:  model.AggregateType,

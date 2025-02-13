@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/dependencies"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/dependencies"
 )
 
 // TODO: UpdateClientHandler

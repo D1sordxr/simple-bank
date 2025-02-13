@@ -1,8 +1,8 @@
 package transaction
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 	"github.com/google/uuid"
 )
 

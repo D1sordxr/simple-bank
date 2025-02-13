@@ -1,8 +1,8 @@
 package client
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client/entity"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 )
 
 func ConvertPhoneEntityToModel(phone entity.Phone) models.Phone {

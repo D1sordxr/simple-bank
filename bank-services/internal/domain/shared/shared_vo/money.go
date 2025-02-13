@@ -1,6 +1,6 @@
 package shared_vo
 
-import "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
+import "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_exceptions"
 
 type Money struct {
 	Value float64

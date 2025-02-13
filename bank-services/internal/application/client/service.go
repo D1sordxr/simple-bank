@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/interfaces"
 )
 
 type Service struct {

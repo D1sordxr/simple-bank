@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction/exceptions"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/exceptions"
 	"strings"
 )
 

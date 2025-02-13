@@ -2,9 +2,9 @@ package account
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 )
 
 type GrpcService struct {

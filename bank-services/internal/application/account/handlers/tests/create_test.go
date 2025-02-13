@@ -2,8 +2,8 @@ package tests
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/application/account/handlers"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/handlers"
 	"github.com/google/uuid"
 	"testing"
 )

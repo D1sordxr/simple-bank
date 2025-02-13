@@ -1,9 +1,9 @@
 package application
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/account"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client"
-	"github.com/D1sordxr/simple-banking-system/internal/application/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction"
 )
 
 type Services struct {

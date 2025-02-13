@@ -1,12 +1,12 @@
 package infrastructure
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/shared/interfaces"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
 )
 
 type Storage struct {

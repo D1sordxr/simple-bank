@@ -2,7 +2,7 @@ package entity
 
 import (
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client/exceptions"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client/exceptions"
 	"github.com/google/uuid"
 	"time"
 )

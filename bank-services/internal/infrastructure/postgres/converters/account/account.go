@@ -1,8 +1,8 @@
 package account
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 )
 
 func ConvertAggregateToModel(account account.Aggregate) models.Account {

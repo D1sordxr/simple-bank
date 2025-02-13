@@ -1,10 +1,10 @@
 package client
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client/entity"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client/vo"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_exceptions"
-	sharedVO "github.com/D1sordxr/simple-banking-system/internal/domain/shared/shared_vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client/entity"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client/vo"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_exceptions"
+	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
 	"github.com/google/uuid"
 	"time"
 )

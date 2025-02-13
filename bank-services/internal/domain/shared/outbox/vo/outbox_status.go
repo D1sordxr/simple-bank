@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox/exceptions"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox/exceptions"
 )
 
 const (

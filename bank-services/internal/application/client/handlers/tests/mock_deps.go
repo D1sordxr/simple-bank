@@ -1,10 +1,10 @@
 package tests
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/dependencies"
-	loadLogger "github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger/handlers/designed"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/mocks"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/dependencies"
+	loadLogger "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger/handlers/designed"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/mocks"
 	"github.com/stretchr/testify/mock"
 )
 

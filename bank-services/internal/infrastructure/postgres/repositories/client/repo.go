@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/client"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
-	converters "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	converters "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/client"
 	"github.com/jackc/pgx/v5"
 )
 

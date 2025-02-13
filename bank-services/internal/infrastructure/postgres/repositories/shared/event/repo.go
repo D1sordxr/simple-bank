@@ -3,9 +3,9 @@ package event
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
-	eventConverter "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	eventConverter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/shared/event"
 	"github.com/jackc/pgx/v5"
 )
 

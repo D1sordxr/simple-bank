@@ -3,9 +3,9 @@ package account
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/account"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres"
-	converters "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/converters/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	converters "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/account"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )

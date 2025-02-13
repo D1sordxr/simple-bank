@@ -2,9 +2,9 @@ package client
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client"
-	"github.com/D1sordxr/simple-banking-system/internal/application/client/commands"
-	"github.com/D1sordxr/simple-banking-system/internal/presentation/grpc/protobuf/services"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/client/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 )
 
 type GrpcService struct {

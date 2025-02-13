@@ -2,38 +2,54 @@ package application
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-banking-system/internal/application/persistence"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/interfaces/persistence"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/queries"
+)
+
+const (
+	StatusPending   = "Pending"
+	StatusProcessed = "Processed"
+	StatusFailed    = "Failed"
+
+	ClientAggregateType      = "Client"
+	AccountAggregateType     = "Account"
+	TransactionAggregateType = "Transaction"
 )
 
 type OutboxProcessor struct {
-	outbox.Repository
+	interfaces.OutboxCommand
+	interfaces.OutboxQuery
 	persistence.UoWManager
 	persistence.Producer
 }
 
-func NewOutboxProcessor(repo outbox.Repository, producer persistence.Producer) *OutboxProcessor {
-	return &OutboxProcessor{Repository: repo, Producer: producer}
+func NewOutboxProcessor(
+	c interfaces.OutboxCommand,
+	q interfaces.OutboxQuery,
+	uow persistence.UoWManager,
+	producer persistence.Producer,
+) *OutboxProcessor {
+	return &OutboxProcessor{
+		OutboxCommand: c,
+		OutboxQuery:   q,
+		UoWManager:    uow,
+		Producer:      producer,
+	}
 }
 
-func (p *OutboxProcessor) ProcessOutbox(ctx context.Context) error {
-	uow := p.UoWManager.GetUoW()
-	tx, err := uow.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			_ = uow.Rollback()
-			// TODO: add logging for panic
-			panic(r)
-		}
-		if err != nil {
-			_ = uow.Rollback()
-		}
-	}()
+func (p *OutboxProcessor) ProcessOutbox(
+	ctx context.Context,
+	c commands.OutboxCommand,
+	q queries.OutboxQuery,
+) error {
 
-	messages, err := p.Repository.FetchPendingMessages(ctx, tx, outbox.BatchSize)
+	// TODO: Logger.Info()
+
+	// TODO: uow.Begin()
+
+	messages, err := p.OutboxQuery.FetchMessages(ctx, q)
 	if err != nil {
 		return err
 	}
@@ -44,14 +60,13 @@ func (p *OutboxProcessor) ProcessOutbox(ctx context.Context) error {
 			continue
 		}
 
-		err = p.Repository.MarkAsProcessed(ctx, tx, msg.OutboxID)
+		err = p.OutboxCommand.UpdateStatus(ctx, c)
 		if err != nil {
-			// TODO: add logging for failed messages
+			// TODO: Logger.Error()
 		}
 	}
 
-	if err = uow.Commit(); err != nil {
-		return err
-	}
+	// TODO: uow.Commit()
+
 	return nil
 }

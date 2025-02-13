@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	storageConfig "github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/config"
+	storageConfig "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/config"
 	"github.com/jackc/pgx/v5"
 )
 

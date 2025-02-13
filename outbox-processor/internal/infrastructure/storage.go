@@ -1,7 +1,7 @@
 package infrastructure
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/outbox"
 )
 
 type Storage struct {

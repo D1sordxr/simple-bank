@@ -1,11 +1,11 @@
 package dependencies
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/application/shared/interfaces"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/domain/transaction"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
 )
 
 type Dependencies struct {

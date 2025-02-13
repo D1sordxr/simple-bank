@@ -1,8 +1,8 @@
 package outbox
 
 import (
-	"github.com/D1sordxr/simple-banking-system/internal/domain/shared/outbox"
-	"github.com/D1sordxr/simple-banking-system/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
 )
 
 func ConvertAggregateToModel(outbox outbox.Outbox) models.Outbox {
