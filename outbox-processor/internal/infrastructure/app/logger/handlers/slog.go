@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger/handlers/designed"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger/handlers/designed"
 	"log/slog"
 	"os"
 )

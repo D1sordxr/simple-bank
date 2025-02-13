@@ -3,11 +3,11 @@ package dao
 import (
 	"context"
 	"errors"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/commands"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/queries"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/commands"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/converters"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/models"
 	"github.com/jackc/pgx/v5"
 )
 

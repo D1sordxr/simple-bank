@@ -1,8 +1,8 @@
 package converters
 
 import (
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/queries"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/models"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/models"
 )
 
 func ConvertModelToDTO(model models.Outbox) queries.OutboxDTO {

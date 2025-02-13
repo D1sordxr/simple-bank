@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka/config"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -9,10 +10,10 @@ type Producer struct {
 	Writer *kafka.Writer
 }
 
-func NewProducer(brokers []string, topic string) *Producer {
+func NewProducer(config *config.KafkaConfig) *Producer {
 	writer := &kafka.Writer{
-		Addr:     kafka.TCP(brokers...),
-		Topic:    topic,
+		Addr:     kafka.TCP(config.Brokers...),
+		Topic:    config.Topic,
 		Balancer: &kafka.LeastBytes{},
 	}
 	return &Producer{Writer: writer}

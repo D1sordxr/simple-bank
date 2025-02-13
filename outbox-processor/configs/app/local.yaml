@@ -1,0 +1,13 @@
+app:
+  mode: "local"
+  outbox_batch_size: 5
+
+storage:
+  host: "postgres"
+  user: "postgres"
+  password: "rootroot"
+  port: 5432
+  database: "BankApp"
+  migration: true
+
+kafka:

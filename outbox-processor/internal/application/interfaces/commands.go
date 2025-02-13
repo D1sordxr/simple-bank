@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/commands"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/commands"
 )
 
 type OutboxCommand interface {
