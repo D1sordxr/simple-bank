@@ -8,7 +8,7 @@ import (
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/interfaces/persistence"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
+	loadLogger "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
 	"os"
 	"os/signal"
 	"sync"
@@ -27,7 +27,7 @@ const (
 )
 
 type OutboxProcessor struct {
-	Logger          *logger.Logger
+	Logger          *loadLogger.Logger
 	OutboxCommand   interfaces.OutboxCommand
 	OutboxQuery     interfaces.OutboxQuery
 	KafkaProducer   persistence.Producer
@@ -37,7 +37,7 @@ type OutboxProcessor struct {
 
 func NewOutboxProcessor(
 	cfg *app.App,
-	log *logger.Logger,
+	log *loadLogger.Logger,
 	c interfaces.OutboxCommand,
 	q interfaces.OutboxQuery,
 	producer persistence.Producer,
@@ -85,10 +85,13 @@ func (p *OutboxProcessor) ProcessOutbox(
 		}
 		c.ID = msg.OutboxID
 
-		err = p.OutboxCommand.UpdateStatus(ctx, c)
-		if err != nil {
-			log.Error("Error updating outbox status")
-			return fmt.Errorf("%s, %w", op, err)
+		if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
+			c.Status = StatusFailed
+			if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
+				log.Error("Error updating outbox status", logger.String("outboxID", c.ID))
+				return fmt.Errorf("%s, %w", op, err)
+			}
+			log.Error("Outbox received status failed", logger.String("outboxID", c.ID))
 		}
 	}
 

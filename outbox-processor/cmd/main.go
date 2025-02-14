@@ -12,6 +12,8 @@ import (
 	loadApp "github.com/D1sordxr/simple-bank/outbox-processor/internal/presentation"
 )
 
+// TODO: Dockerfile
+
 func main() {
 	cfg := loadConfig.NewConfig()
 
@@ -23,8 +25,8 @@ func main() {
 	outboxDAO := loadPostgresDAO.NewOutboxDAO(databaseConn)
 
 	storage := loadStorage.NewStorage(
-		outboxDAO, // write dao
-		outboxDAO, // read dao
+		outboxDAO, // write dao implementation
+		outboxDAO, // read dao implementation
 	)
 
 	kafkaProducer := loadKafka.NewProducer(&cfg.KafkaConfig)
