@@ -3,6 +3,7 @@ package app
 import (
 	kafkaConfig "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka/config"
 	storageConfig "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/config"
+	"time"
 )
 
 type Config struct {
@@ -12,6 +13,7 @@ type Config struct {
 }
 
 type App struct {
-	Mode            string `yaml:"mode"`
-	OutboxBatchSize int    `yaml:"outbox_batch_size"`
+	Mode            string        `yaml:"mode"`
+	OutboxBatchSize int           `yaml:"outbox_batch_size"`
+	Ticker          time.Duration `yaml:"ticker"`
 }

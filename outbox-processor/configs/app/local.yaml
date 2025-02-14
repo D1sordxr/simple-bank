@@ -1,6 +1,7 @@
 app:
   mode: "local"
   outbox_batch_size: 5
+  ticker: 15s
 
 storage:
   host: "postgres"

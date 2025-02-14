@@ -1,37 +1,42 @@
 package main
 
 import (
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
-	logger2 "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger/handlers"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres"
-	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/dao"
+	loadService "github.com/D1sordxr/simple-bank/outbox-processor/internal/application"
+	loadStorage "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure"
+	loadConfig "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
+	loadLogger "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
+	loadSlogHandler "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger/handlers"
+	loadKafka "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka"
+	loadPostgres "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres"
+	loadPostgresDAO "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/dao"
+	loadApp "github.com/D1sordxr/simple-bank/outbox-processor/internal/presentation"
 )
 
 func main() {
-	cfg := app.NewConfig()
+	cfg := loadConfig.NewConfig()
 
-	slogLogger := handlers.NewSlogLogger(cfg)
-	logger := logger2.NewLogger(slogLogger)
-	logger.Error("app logging in not implemented")
+	slogLogger := loadSlogHandler.NewSlogLogger(cfg)
+	logger := loadLogger.NewLogger(slogLogger)
 
-	databaseConn := postgres.NewConnection(&cfg.StorageConfig)
+	databaseConn := loadPostgres.NewConnection(&cfg.StorageConfig)
 
-	outboxDAO := dao.NewOutboxDAO(databaseConn)
+	outboxDAO := loadPostgresDAO.NewOutboxDAO(databaseConn)
 
-	storage := infrastructure.NewStorage(
-		outboxDAO,
-		outboxDAO,
+	storage := loadStorage.NewStorage(
+		outboxDAO, // write dao
+		outboxDAO, // read dao
 	)
 
-	kafkaProducer := kafka.NewProducer(&cfg.KafkaConfig)
+	kafkaProducer := loadKafka.NewProducer(&cfg.KafkaConfig)
 
-	processorService := application.NewOutboxProcessor(
+	processorService := loadService.NewOutboxProcessor(
+		&cfg.AppConfig,
+		logger,
 		storage.OutboxCommandDAO,
 		storage.OutboxQueryDAO,
 		kafkaProducer,
 	)
+
+	app := loadApp.NewApp(processorService)
+	app.RunApp()
 }

@@ -2,15 +2,18 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/commands"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/interfaces"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/interfaces/persistence"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
-	loadLogger "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 )
 
 const (
@@ -24,16 +27,17 @@ const (
 )
 
 type OutboxProcessor struct {
-	*loadLogger.Logger
-	interfaces.OutboxCommand
-	interfaces.OutboxQuery
-	persistence.Producer
+	Logger          *logger.Logger
+	OutboxCommand   interfaces.OutboxCommand
+	OutboxQuery     interfaces.OutboxQuery
+	KafkaProducer   persistence.Producer
+	Ticker          time.Duration
 	OutboxBatchSize int
 }
 
 func NewOutboxProcessor(
 	cfg *app.App,
-	log *loadLogger.Logger,
+	log *logger.Logger,
 	c interfaces.OutboxCommand,
 	q interfaces.OutboxQuery,
 	producer persistence.Producer,
@@ -42,7 +46,8 @@ func NewOutboxProcessor(
 		Logger:          log,
 		OutboxCommand:   c,
 		OutboxQuery:     q,
-		Producer:        producer,
+		KafkaProducer:   producer,
+		Ticker:          cfg.Ticker,
 		OutboxBatchSize: cfg.OutboxBatchSize,
 	}
 }
@@ -53,38 +58,48 @@ func (p *OutboxProcessor) ProcessOutbox(
 	q queries.OutboxQuery,
 ) error {
 	const op = "Service.OutboxProcessor.ProcessOutbox"
+
 	logger := p.Logger
 	log := logger.With(
 		logger.String("operation", op),
-		logger.String("clientEmail", c.Email),
+		logger.Group("query",
+			logger.String("aggregateType", q.AggregateType),
+			logger.String("status", q.Status),
+		),
 	)
+
+	log.Info("Starting processing outbox...")
 
 	// TODO: uow.Begin()
 
 	messages, err := p.OutboxQuery.FetchMessages(ctx, q)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s, %w", op, err)
 	}
 
 	for _, msg := range messages {
-		err = p.Producer.SendMessage(ctx, []byte(msg.AggregateID), []byte(msg.MessagePayload))
+		err = p.KafkaProducer.SendMessage(ctx, []byte(msg.OutboxID), []byte(msg.MessagePayload))
 		if err != nil {
-			continue
+			log.Error("Error producing kafka messages")
+			return fmt.Errorf("%s, %w", op, err)
 		}
 		c.ID = msg.OutboxID
 
 		err = p.OutboxCommand.UpdateStatus(ctx, c)
 		if err != nil {
-			// TODO: Logger.Error()
+			log.Error("Error updating outbox status")
+			return fmt.Errorf("%s, %w", op, err)
 		}
 	}
 
 	// TODO: uow.Commit()
 
+	log.Info("Outbox processed successfully!")
+
 	return nil
 }
 
-func (p *OutboxProcessor) processClientOutbox() {
+func (p *OutboxProcessor) processClientOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: StatusProcessed,
 	}
@@ -94,15 +109,15 @@ func (p *OutboxProcessor) processClientOutbox() {
 		Limit:         p.OutboxBatchSize,
 	}
 
-	ctx := context.Background()
-
 	err := p.ProcessOutbox(ctx, command, query)
 	if err != nil {
-		// TODO: Logger.Error()
+		return err
 	}
+
+	return nil
 }
 
-func (p *OutboxProcessor) processAccountOutbox() {
+func (p *OutboxProcessor) processAccountOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: StatusProcessed,
 	}
@@ -112,15 +127,15 @@ func (p *OutboxProcessor) processAccountOutbox() {
 		Limit:         p.OutboxBatchSize,
 	}
 
-	ctx := context.Background()
-
 	err := p.ProcessOutbox(ctx, command, query)
 	if err != nil {
-		// TODO: Logger.Error()
+		return err
 	}
+
+	return nil
 }
 
-func (p *OutboxProcessor) processTransactionOutbox() {
+func (p *OutboxProcessor) processTransactionOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: StatusProcessed,
 	}
@@ -130,40 +145,83 @@ func (p *OutboxProcessor) processTransactionOutbox() {
 		Limit:         p.OutboxBatchSize,
 	}
 
-	ctx := context.Background()
-
 	err := p.ProcessOutbox(ctx, command, query)
 	if err != nil {
-		// TODO: Logger.Error()
+		return err
 	}
+
+	return nil
 }
 
 func (p *OutboxProcessor) Run() {
-	var err error
+	wg := &sync.WaitGroup{}
 	errorsChannel := make(chan error, 1)
 
+	// Graceful shutdown context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go p.processClientOutbox()
-	go p.processAccountOutbox()
-	go p.processTransactionOutbox()
+	// Timer channel
+	ticker := time.NewTicker(p.Ticker)
+	defer ticker.Stop()
 
+	// Signal handler for graceful shutdown
 	go func() {
 		stop := make(chan os.Signal, 1)
 		signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 		<-stop
-		//s.Logger.Info("Stop signal received...")
+		p.Logger.Info("Stop signal received, shutting down...")
 		cancel()
 	}()
 
-	select {
-	case <-ctx.Done():
-		//s.Logger.Info("Stopping application...", s.Logger.String("reason", "stop signal"))
-	case err = <-errorsChannel:
-		//s.Logger.Error("Application encountered an error", s.Logger.String("error", err.Error()))
-	}
+	for {
+		select {
+		case <-ctx.Done():
+			p.Logger.Info("Context cancelled, shutting down all processes...")
+			wg.Wait()
+			return
+		case <-ticker.C:
+			wg.Add(3)
 
-	//s.Down()
-	//s.Logger.Info("Gracefully stopped")
+			// Process Client Outbox
+			go func() {
+				defer wg.Done()
+
+				ctxWithTimeout, timeoutCancel := context.WithTimeout(ctx, p.Ticker)
+				defer timeoutCancel()
+
+				if err := p.processClientOutbox(ctxWithTimeout); err != nil {
+					errorsChannel <- err
+				}
+			}()
+
+			// Process Account Outbox
+			go func() {
+				defer wg.Done()
+
+				ctxWithTimeout, timeoutCancel := context.WithTimeout(ctx, p.Ticker)
+				defer timeoutCancel()
+
+				if err := p.processAccountOutbox(ctxWithTimeout); err != nil {
+					errorsChannel <- err
+				}
+			}()
+
+			// Process Transaction Outbox
+			go func() {
+				defer wg.Done()
+
+				ctxWithTimeout, timeoutCancel := context.WithTimeout(ctx, p.Ticker)
+				defer timeoutCancel()
+
+				if err := p.processTransactionOutbox(ctxWithTimeout); err != nil {
+					errorsChannel <- err
+				}
+			}()
+		case err := <-errorsChannel:
+			p.Logger.Error("Application encountered an error", p.Logger.String("error", err.Error()))
+
+			// cancel()
+		}
+	}
 }
