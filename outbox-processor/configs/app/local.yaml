@@ -12,3 +12,5 @@ storage:
   migration: true
 
 kafka:
+  brokers:
+    - "kafka:9092"

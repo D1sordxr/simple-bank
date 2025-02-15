@@ -12,7 +12,7 @@ import (
 	loadApp "github.com/D1sordxr/simple-bank/outbox-processor/internal/presentation"
 )
 
-// TODO: Dockerfile
+// TODO: transaction + batch (implement using context with value)
 
 func main() {
 	cfg := loadConfig.NewConfig()

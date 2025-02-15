@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/commands"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres"
@@ -20,7 +21,7 @@ func NewOutboxDAO(connection *postgres.Connection) *OutboxDAO {
 }
 
 func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) (queries.OutboxDTOs, error) {
-	// TODO: operation
+	const op = "postgres.OutboxDAO.FetchMessages"
 
 	// TODO: if tx { conn := tx }
 
@@ -35,7 +36,7 @@ func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return queries.OutboxDTOs{}, nil
 		}
-		return nil, QueryErr
+		return nil, fmt.Errorf("%s: %w", op, QueryErr)
 	}
 	defer rows.Close()
 
@@ -52,7 +53,7 @@ func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) 
 			&msgModel.CreatedAt,
 		)
 		if err != nil {
-			return nil, RowScanningErr
+			return nil, fmt.Errorf("%s: %w", op, RowScanningErr)
 		}
 
 		message := converters.ConvertModelToDTO(msgModel)
@@ -67,6 +68,7 @@ func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) 
 }
 
 func (dao *OutboxDAO) UpdateStatus(ctx context.Context, c commands.OutboxCommand) error {
+	const op = "postgres.OutboxDAO.UpdateStatus"
 
 	// TODO: if tx { conn := tx }
 
@@ -74,7 +76,7 @@ func (dao *OutboxDAO) UpdateStatus(ctx context.Context, c commands.OutboxCommand
 
 	_, err := dao.Connection.Exec(ctx, query, c.Status, c.ID)
 	if err != nil {
-		return StatusUpdateError
+		return fmt.Errorf("%s: %w", op, StatusUpdateError)
 	}
 
 	return nil
