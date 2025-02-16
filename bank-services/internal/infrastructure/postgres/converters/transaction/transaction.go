@@ -17,16 +17,20 @@ func ConvertAggregateToModel(agg transaction.Aggregate) models.TransactionModel 
 		UpdatedAt: agg.UpdatedAt,
 	}
 
-	if agg.SourceAccountID.Value != uuid.Nil {
+	if agg.SourceAccountID != nil && agg.SourceAccountID.Value != uuid.Nil {
 		model.SourceAccountID = &agg.SourceAccountID.Value
 	}
 
-	if agg.DestinationAccountID.Value != uuid.Nil {
+	if agg.DestinationAccountID != nil && agg.DestinationAccountID.Value != uuid.Nil {
 		model.DestinationAccountID = &agg.DestinationAccountID.Value
 	}
 
-	if agg.Description.Value != "" {
+	if agg.Description != nil && agg.Description.Value != "" {
 		model.Description = &agg.Description.Value
+	}
+
+	if agg.FailureReason != nil {
+		model.FailureReason = agg.FailureReason
 	}
 
 	return model

@@ -55,7 +55,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 
 	status := vo.NewStatus()
 
-	account, err := accountRoot.NewAccount(clientID, accountID, balance, currency, status)
+	account, err := accountRoot.NewAccount(accountID, clientID, balance, currency, status)
 	if err != nil {
 		log.Error(sharedExceptions.LogAggregateCreationError("account"), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
