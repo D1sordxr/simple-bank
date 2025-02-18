@@ -10,7 +10,7 @@ import (
 
 type Dependencies struct {
 	Logger            *logger.Logger
-	UoWManager        interfaces.UoWManager
+	UoWManager        interfaces.UnitOfWork
 	EventRepository   event.Repository
 	OutboxRepository  outbox.Repository
 	AccountRepository account.Repository
@@ -18,7 +18,7 @@ type Dependencies struct {
 
 func NewAccountDependencies(
 	logger *logger.Logger,
-	uow interfaces.UoWManager,
+	uow interfaces.UnitOfWork,
 	event event.Repository,
 	outbox outbox.Repository,
 	repo account.Repository,

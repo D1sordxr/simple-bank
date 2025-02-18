@@ -2,7 +2,6 @@ package uow
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -13,25 +12,13 @@ var (
 	ctx                 = context.Background()
 )
 
-type UoWManager struct {
-	Conn *postgres.Connection
-}
-
-func (u *UoWManager) GetUoW() interfaces.UnitOfWork {
-	return &UoW{
-		Conn: u.Conn,
-	}
-}
-
-func NewUoWManager(conn *postgres.Connection) *UoWManager {
-	return &UoWManager{
-		Conn: conn,
-	}
-}
-
 type UoW struct {
-	Conn *postgres.Connection
+	Conn *postgres.Pool
 	Tx   pgx.Tx
+}
+
+func NewUoW(pool *postgres.Pool) *UoW {
+	return &UoW{Conn: pool}
 }
 
 func (u *UoW) Begin() (interface{}, error) {

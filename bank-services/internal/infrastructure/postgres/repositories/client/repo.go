@@ -11,10 +11,10 @@ import (
 )
 
 type Repository struct {
-	Conn *postgres.Connection
+	Conn *postgres.Pool
 }
 
-func NewClientRepository(conn *postgres.Connection) *Repository {
+func NewClientRepository(conn *postgres.Pool) *Repository {
 	return &Repository{Conn: conn}
 }
 

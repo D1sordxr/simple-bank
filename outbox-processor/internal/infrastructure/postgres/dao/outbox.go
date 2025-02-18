@@ -36,7 +36,8 @@ func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return queries.OutboxDTOs{}, nil
 		}
-		return nil, fmt.Errorf("%s: %w", op, QueryErr)
+		//return nil, fmt.Errorf("%s: %w", op, QueryErr)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	defer rows.Close()
 

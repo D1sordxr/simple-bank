@@ -30,6 +30,8 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
+// TODO: Application - rework uow and check pgx.Pool work
+
 // TODO: Transaction - add reversal type support
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
 // TODO: UoW - rework: add batch + add send transaction in ctx
@@ -48,15 +50,16 @@ func main() {
 	slogLogger := loadSlogLogger.NewSlogLogger(cfg)
 	logger := loadLogger.NewLogger(slogLogger)
 
-	databaseConn := loadPostgresConnection.NewConnection(&cfg.StorageConfig)
+	_ = loadPostgresConnection.NewConnection(&cfg.StorageConfig) // := databaseConn
+	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
 
-	uowManager := loadPostgresUoW.NewUoWManager(databaseConn)
-	eventRepository := loadPostgresEventRepo.NewEventRepository(databaseConn)
-	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databaseConn)
+	uowManager := loadPostgresUoW.NewUoW(databasePool)
+	eventRepository := loadPostgresEventRepo.NewEventRepository(databasePool)
+	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databasePool)
 
-	clientRepository := loadPostgresClientRepo.NewClientRepository(databaseConn)
-	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseConn)
-	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseConn)
+	clientRepository := loadPostgresClientRepo.NewClientRepository(databasePool)
+	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databasePool)
+	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databasePool)
 
 	storage := loadStorage.NewStorage(
 		uowManager,            // unitOfWork manager implementation

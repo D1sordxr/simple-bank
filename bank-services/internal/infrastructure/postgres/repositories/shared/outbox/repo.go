@@ -10,10 +10,10 @@ import (
 )
 
 type Repository struct {
-	Conn *postgres.Connection
+	Conn *postgres.Pool
 }
 
-func NewOutboxRepository(conn *postgres.Connection) *Repository {
+func NewOutboxRepository(conn *postgres.Pool) *Repository {
 	return &Repository{Conn: conn}
 }
 

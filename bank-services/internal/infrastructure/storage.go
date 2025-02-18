@@ -10,7 +10,7 @@ import (
 )
 
 type Storage struct {
-	UnitOfWork            interfaces.UoWManager
+	UnitOfWork            interfaces.UnitOfWork
 	EventRepository       event.Repository
 	OutboxRepository      outbox.Repository
 	ClientRepository      client.Repository
@@ -18,7 +18,7 @@ type Storage struct {
 	TransactionRepository transaction.Repository
 }
 
-func NewStorage(uow interfaces.UoWManager,
+func NewStorage(uow interfaces.UnitOfWork,
 	event event.Repository,
 	outbox outbox.Repository,
 	client client.Repository,
