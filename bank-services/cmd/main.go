@@ -53,7 +53,7 @@ func main() {
 	_ = loadPostgresConnection.NewConnection(&cfg.StorageConfig) // := databaseConn
 	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
 
-	uowManager := loadPostgresUoW.NewUoW(databasePool)
+	unitOfWork := loadPostgresUoW.NewUoW(databasePool)
 	eventRepository := loadPostgresEventRepo.NewEventRepository(databasePool)
 	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databasePool)
 
@@ -62,7 +62,7 @@ func main() {
 	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databasePool)
 
 	storage := loadStorage.NewStorage(
-		uowManager,            // unitOfWork manager implementation
+		unitOfWork,            // unitOfWork implementation
 		eventRepository,       // event repository implementation
 		outboxRepository,      // outbox repository implementation
 		clientRepository,      // client repository implementation

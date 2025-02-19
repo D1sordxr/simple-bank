@@ -2,7 +2,6 @@ package mocks
 
 import (
 	"context"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
 )
 
 var (
@@ -31,11 +30,4 @@ func (t *TestUoW) BeginSerializableTxWithRetry() (interface{}, error) {
 func (t *TestUoW) BeginSerializableTx() (interface{}, error) {
 	_ = ctx
 	return nil, nil
-}
-
-type TestUoWManager struct {
-}
-
-func (t *TestUoWManager) GetUoW() interfaces.UnitOfWork {
-	return &TestUoW{}
 }

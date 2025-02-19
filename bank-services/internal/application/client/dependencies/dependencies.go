@@ -10,7 +10,7 @@ import (
 
 type Dependencies struct {
 	Logger           *logger.Logger
-	UoWManager       interfaces.UnitOfWork
+	UnitOfWork       interfaces.UnitOfWork
 	EventRepository  event.Repository
 	OutboxRepository outbox.Repository
 	ClientRepository client.Repository
@@ -25,7 +25,7 @@ func NewClientDependencies(
 ) *Dependencies {
 	return &Dependencies{
 		Logger:           logger,
-		UoWManager:       uow,
+		UnitOfWork:       uow,
 		EventRepository:  event,
 		OutboxRepository: outbox,
 		ClientRepository: repo,

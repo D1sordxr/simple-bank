@@ -66,7 +66,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	uow := h.deps.UoWManager.GetUoW()
+	uow := h.deps.UnitOfWork
 	tx, err := uow.Begin()
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
