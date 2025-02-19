@@ -30,11 +30,9 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: Application - rework uow and check pgx.Pool work
-
-// TODO: Transaction - add reversal type support
+// TODO: UnitOfWork - change context values to "tx" and "batch" -> add repo support -> replace with storage.UoW
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
-// TODO: UoW - rework: add batch + add send transaction in ctx
+// TODO: Transaction - add reversal type support
 
 // TODO: Workers...
 // TODO: Outbox reader and Kafka producer service
@@ -50,7 +48,6 @@ func main() {
 	slogLogger := loadSlogLogger.NewSlogLogger(cfg)
 	logger := loadLogger.NewLogger(slogLogger)
 
-	_ = loadPostgresConnection.NewConnection(&cfg.StorageConfig) // := databaseConn
 	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
 
 	unitOfWork := loadPostgresUoW.NewUoW(databasePool)
