@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	contextUtils "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/context-utils"
 	eventConverter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/shared/event"
-	"github.com/jackc/pgx/v5"
 )
 
 type Repository struct {
 	Conn *postgres.Pool
 }
 
-func NewEventRepository(conn *postgres.Pool) *Repository {
+func NewEventRepositoryV2(conn *postgres.Pool) *Repository {
 	return &Repository{Conn: conn}
 }
 
-func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.Event) error {
+func (r *Repository) SaveEvent(ctx context.Context, event event.Event) error {
 	const op = "postgres.EventRepository.SaveEvent"
 	query := `INSERT INTO events (
         id, 
@@ -30,8 +30,12 @@ func (r *Repository) SaveEvent(ctx context.Context, tx interface{}, event event.
 
 	model := eventConverter.ConvertAggregateToModel(event)
 
-	conn := tx.(pgx.Tx)
-	_, err := conn.Exec(ctx, query,
+	tx, err := contextUtils.GetTxFromContext(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = tx.Exec(ctx, query,
 		model.ID,
 		model.AggregateID,
 		model.AggregateType,

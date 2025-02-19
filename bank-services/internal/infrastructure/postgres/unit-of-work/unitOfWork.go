@@ -4,41 +4,40 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const UoWContextKey = "uow"
-
 type UnitOfWork interface {
-	BeginTxWithBatch(ctx context.Context) (context.Context, error)
-	BeginTx(ctx context.Context) (context.Context, error)
+	BeginWithTxBatch(ctx context.Context) (context.Context, error)
+	BeginWithTx(ctx context.Context) (context.Context, error)
 	Rollback(ctx context.Context) error
 	Commit(ctx context.Context) error
 }
 
 type UnitOfWorkImpl struct {
-	Logger *logger.Logger
-	Pool   *pgxpool.Pool
-	Batch  *pgx.Batch
-	Tx     pgx.Tx
+	Logger   *logger.Logger
+	Executor *executor.Executor
+	Batch    *pgx.Batch
+	Tx       pgx.Tx
 }
 
 func NewUnitOfWork(
 	logger *logger.Logger,
-	pool *pgxpool.Pool,
+	executor *executor.Executor,
 	batch *pgx.Batch,
 	tx pgx.Tx,
 ) *UnitOfWorkImpl {
 	return &UnitOfWorkImpl{
-		Logger: logger,
-		Pool:   pool,
-		Batch:  batch,
-		Tx:     tx,
+		Logger:   logger,
+		Executor: executor,
+		Batch:    batch,
+		Tx:       tx,
 	}
 }
 
-func (u *UnitOfWorkImpl) BeginTxWithBatch(ctx context.Context) (context.Context, error) {
+// BeginWithTxBatch TODO: finish the implementation of the method
+func (u *UnitOfWorkImpl) BeginWithTxBatch(ctx context.Context) (context.Context, error) {
 	const op = "postgres.UnitOfWork.BeginTxWithBatch"
 	log := u.Logger.With(u.Logger.String("operation", op))
 
@@ -48,7 +47,7 @@ func (u *UnitOfWorkImpl) BeginTxWithBatch(ctx context.Context) (context.Context,
 
 	log.Info("Starting new transaction with batch")
 
-	tx, err := u.Pool.Begin(ctx)
+	tx, err := u.Executor.Begin(ctx)
 	if err != nil {
 		log.Error("Failed to start transaction", "error", err)
 		return context.Background(), fmt.Errorf("%s: %w: %v", op, ErrTxStartFailed, err)
@@ -58,12 +57,13 @@ func (u *UnitOfWorkImpl) BeginTxWithBatch(ctx context.Context) (context.Context,
 	batch := &pgx.Batch{}
 	u.Batch = batch
 
-	ctx = context.WithValue(ctx, UoWContextKey, u)
+	// TODO: implement the logic for injecting the batch into the transaction
+	ctx = u.Executor.InjectTx(ctx, tx)
 
 	return ctx, nil
 }
 
-func (u *UnitOfWorkImpl) BeginTx(ctx context.Context) (context.Context, error) {
+func (u *UnitOfWorkImpl) BeginWithTx(ctx context.Context) (context.Context, error) {
 	const op = "postgres.UnitOfWork.BeginTx"
 	log := u.Logger.With(u.Logger.String("operation", op))
 
@@ -73,14 +73,14 @@ func (u *UnitOfWorkImpl) BeginTx(ctx context.Context) (context.Context, error) {
 
 	log.Info("Starting new transaction")
 
-	tx, err := u.Pool.Begin(ctx)
+	tx, err := u.Executor.Begin(ctx)
 	if err != nil {
 		log.Error("Failed to start transaction", "error", err)
 		return context.Background(), fmt.Errorf("%s: %w: %v", op, ErrTxStartFailed, err)
 	}
 	u.Tx = tx
 
-	ctx = context.WithValue(ctx, UoWContextKey, u)
+	ctx = u.Executor.InjectTx(ctx, tx)
 
 	return ctx, nil
 }
@@ -137,6 +137,7 @@ func (u *UnitOfWorkImpl) Rollback(ctx context.Context) error {
 }
 
 func parseContext(ctx context.Context) (*UnitOfWorkImpl, error) {
+
 	uow := ctx.Value(UoWContextKey)
 	if uow == nil {
 		return nil, ErrUoWNotFound
