@@ -1,9 +1,5 @@
 package interfaces
 
-type UoWManager interface {
-	GetUoW() UnitOfWork
-}
-
 type UnitOfWork interface {
 	Begin() (interface{}, error)
 	Commit() error

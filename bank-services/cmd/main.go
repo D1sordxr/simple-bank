@@ -21,7 +21,7 @@ import (
 	loadPostgresEventRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/shared/event"
 	loadPostgresOutboxRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/shared/outbox"
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/transaction"
-	loadPostgresUoW "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/uow"
+	loadPostgresUoW "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/unit-of-work/uow-v0"
 	loadApp "github.com/D1sordxr/simple-bank/bank-services/internal/presentation"
 	loadGrpcServer "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc"
 	loadGrpcServices "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers"

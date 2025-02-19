@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
-	contextUtils "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/context-utils"
 	eventConverter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 )
 
 type Repository struct {
-	Conn *postgres.Pool
+	Executor *executor.Executor
 }
 
-func NewEventRepositoryV2(conn *postgres.Pool) *Repository {
-	return &Repository{Conn: conn}
+func NewEventRepositoryV2(executor *executor.Executor) *Repository {
+	return &Repository{Executor: executor}
 }
 
 func (r *Repository) SaveEvent(ctx context.Context, event event.Event) error {
@@ -30,12 +29,9 @@ func (r *Repository) SaveEvent(ctx context.Context, event event.Event) error {
 
 	model := eventConverter.ConvertAggregateToModel(event)
 
-	tx, err := contextUtils.GetTxFromContext(ctx)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
+	conn := r.Executor.GetExecutor(ctx)
 
-	_, err = tx.Exec(ctx, query,
+	_, err := conn.Exec(ctx, query,
 		model.ID,
 		model.AggregateID,
 		model.AggregateType,

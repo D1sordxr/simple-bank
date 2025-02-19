@@ -70,7 +70,7 @@ func (p *OutboxProcessor) ProcessOutbox(
 
 	log.Info("Starting processing outbox...")
 
-	// TODO: uow.Begin()
+	// TODO: uow-v0.Begin()
 
 	messages, err := p.OutboxQuery.FetchMessages(ctx, q)
 	if err != nil {
@@ -95,7 +95,7 @@ func (p *OutboxProcessor) ProcessOutbox(
 		}
 	}
 
-	// TODO: uow.Commit()
+	// TODO: uow-v0.Commit()
 
 	log.Info("Outbox processed successfully!")
 
