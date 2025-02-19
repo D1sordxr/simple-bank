@@ -2,7 +2,6 @@ package unit_of_work
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
 	"github.com/jackc/pgx/v5"
@@ -11,7 +10,6 @@ import (
 
 const UoWContextKey = "uow"
 
-// UnitOfWork определяет интерфейс для работы с транзакциями и батчами.
 type UnitOfWork interface {
 	BeginTxWithBatch(ctx context.Context) (context.Context, error)
 	BeginTx(ctx context.Context) (context.Context, error)
@@ -39,17 +37,6 @@ func NewUnitOfWork(
 		Tx:     tx,
 	}
 }
-
-var (
-	ErrTxAlreadyStarted = errors.New("transaction already started")
-	ErrTxStartFailed    = errors.New("failed to start transaction")
-	ErrSendingBatch     = errors.New("failed to close batch")
-	ErrCommitTx         = errors.New("failed to commit transaction")
-	ErrNoRollbackTx     = errors.New("no transaction to rollback")
-	ErrRollbackTx       = errors.New("failed to rollback tx")
-	ErrUoWNotFound      = errors.New("unit of work not found in context")
-	ErrInvalidUoWType   = errors.New("invalid unit of work type in context")
-)
 
 func (u *UnitOfWorkImpl) BeginTxWithBatch(ctx context.Context) (context.Context, error) {
 	const op = "postgres.UnitOfWork.BeginTxWithBatch"
