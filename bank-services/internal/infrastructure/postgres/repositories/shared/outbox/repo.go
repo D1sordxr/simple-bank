@@ -4,23 +4,23 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
 	outboxConverter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/shared/outbox"
-	"github.com/jackc/pgx/v5"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 )
 
 type Repository struct {
-	Conn *postgres.Pool
+	Executor *executor.Executor
 }
 
-func NewOutboxRepository(conn *postgres.Pool) *Repository {
-	return &Repository{Conn: conn}
+func NewOutboxRepository(executor *executor.Executor) *Repository {
+	return &Repository{Executor: executor}
 }
 
-func (r *Repository) SaveOutboxEvent(ctx context.Context, tx interface{}, outbox outbox.Outbox) error {
+func (r *Repository) SaveOutboxEvent(ctx context.Context, outbox outbox.Outbox) error {
 	const op = "postgres.OutboxRepository.SaveOutboxEvent"
 
-	conn := tx.(pgx.Tx)
+	conn := r.Executor.GetExecutor(ctx)
+
 	query := `INSERT INTO outbox (
         id, 
         aggregate_id, 

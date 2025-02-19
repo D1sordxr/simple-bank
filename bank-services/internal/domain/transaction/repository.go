@@ -5,5 +5,5 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, tx interface{}, transaction Aggregate) error
+	Create(ctx context.Context, transaction Aggregate) error
 }

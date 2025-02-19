@@ -1,9 +1,10 @@
 package interfaces
 
+import "context"
+
 type UnitOfWork interface {
-	Begin() (interface{}, error)
-	Commit() error
-	Rollback() error
-	BeginSerializableTx() (interface{}, error)
-	BeginSerializableTxWithRetry() (interface{}, error)
+	BeginWithTxBatch(ctx context.Context) (context.Context, error)
+	BeginWithTx(ctx context.Context) (context.Context, error)
+	Rollback(ctx context.Context) error
+	Commit(ctx context.Context) error
 }

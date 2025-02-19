@@ -67,23 +67,23 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 
 	uow := h.deps.UnitOfWork
-	tx, err := uow.Begin()
+	ctx, err = uow.BeginWithTx(ctx)
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			_ = uow.Rollback()
+			_ = uow.Rollback(ctx)
 			panic(r)
 		}
 		if err != nil {
 			log.Error(sharedExceptions.LogErrorAsString(err))
-			_ = uow.Rollback()
+			_ = uow.Rollback(ctx)
 		}
 	}()
 
-	err = h.deps.ClientRepository.Create(ctx, tx, client)
+	err = h.deps.ClientRepository.Create(ctx, client)
 	if err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
@@ -94,7 +94,7 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		log.Error(sharedExceptions.LogEventCreationError(), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	if err = h.deps.EventRepository.SaveEvent(ctx, tx, clientEvent); err != nil {
+	if err = h.deps.EventRepository.SaveEvent(ctx, clientEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -104,11 +104,11 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 		log.Error(sharedExceptions.LogOutboxCreationError(), sharedExceptions.LogError(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
+	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, outboxEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 	}
 
-	if err = uow.Commit(); err != nil {
+	if err = uow.Commit(ctx); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}

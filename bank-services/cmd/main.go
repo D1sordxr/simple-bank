@@ -16,12 +16,13 @@ import (
 	loadLogger "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
 	loadSlogLogger "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger/handlers"
 	loadPostgresConnection "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
+	loadPosgresExecutor "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 	loadPostgresAccountRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/account"
 	loadPostgresClientRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/client"
 	loadPostgresEventRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/shared/event"
 	loadPostgresOutboxRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/shared/outbox"
 	loadPostgresTransactionRepo "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/repositories/transaction"
-	loadPostgresUoW "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/unit-of-work/uow-v0"
+	loadPostgresUoW "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/unit-of-work"
 	loadApp "github.com/D1sordxr/simple-bank/bank-services/internal/presentation"
 	loadGrpcServer "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc"
 	loadGrpcServices "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers"
@@ -30,9 +31,9 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: UnitOfWork - change context values to "tx" and "batch" -> add repo support -> replace with storage.UoW
+// TODO: UnitOfWork + Executor - add repo support -> implement and use in application services
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
-// TODO: Transaction - add reversal type support
+// TODO: Transaction (aggregate) - add reversal type support
 
 // TODO: Workers...
 // TODO: Outbox reader and Kafka producer service
@@ -49,14 +50,15 @@ func main() {
 	logger := loadLogger.NewLogger(slogLogger)
 
 	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
+	databaseExecutor := loadPosgresExecutor.NewExecutor(databasePool)
+	unitOfWork := loadPostgresUoW.NewUnitOfWork(logger, databaseExecutor)
 
-	unitOfWork := loadPostgresUoW.NewUoW(databasePool)
-	eventRepository := loadPostgresEventRepo.NewEventRepository(databasePool)
-	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databasePool)
+	eventRepository := loadPostgresEventRepo.NewEventRepository(databaseExecutor)
+	outboxRepository := loadPostgresOutboxRepo.NewOutboxRepository(databaseExecutor)
 
-	clientRepository := loadPostgresClientRepo.NewClientRepository(databasePool)
-	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databasePool)
-	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databasePool)
+	clientRepository := loadPostgresClientRepo.NewClientRepository(databaseExecutor)
+	accountRepository := loadPostgresAccountRepo.NewAccountRepository(databaseExecutor)
+	transactionRepository := loadPostgresTransactionRepo.NewTransactionRepository(databaseExecutor)
 
 	storage := loadStorage.NewStorage(
 		unitOfWork,            // unitOfWork implementation

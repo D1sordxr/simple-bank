@@ -5,23 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/client"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
 	converters "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/client"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 	"github.com/jackc/pgx/v5"
 )
 
 type Repository struct {
-	Conn *postgres.Pool
+	Executor *executor.Executor
 }
 
-func NewClientRepository(conn *postgres.Pool) *Repository {
-	return &Repository{Conn: conn}
+func NewClientRepository(executor *executor.Executor) *Repository {
+	return &Repository{Executor: executor}
 }
 
-func (r *Repository) Create(ctx context.Context, tx interface{}, client client.Aggregate) error {
+func (r *Repository) Create(ctx context.Context, client client.Aggregate) error {
 	const op = "postgres.ClientRepository.Create"
 
-	conn := tx.(pgx.Tx)
+	conn := r.Executor.GetExecutor(ctx)
 
 	clientsQuery := `INSERT INTO clients (
         id, 
@@ -78,28 +78,23 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, client client.A
 	return nil
 }
 
-func (r *Repository) Update(ctx context.Context, tx interface{}, client client.Aggregate) error {
+func (r *Repository) Update(ctx context.Context, client client.Aggregate) error {
 
 	// TODO: ...
 
 	return nil
 }
 
-func (r *Repository) Load(ctx context.Context, email string) (client.Aggregate, error) {
-
-	// TODO: ...
-
-	return client.Aggregate{}, nil
-}
-
 func (r *Repository) Exists(ctx context.Context, email string) error {
 	const op = "postgres.ClientRepository.Exists"
+
+	conn := r.Executor.GetExecutor(ctx)
 
 	query := `SELECT email FROM clients WHERE email = $1`
 
 	var existingEmail string
 
-	err := r.Conn.QueryRow(ctx, query, email).Scan(&existingEmail)
+	err := conn.QueryRow(ctx, query, email).Scan(&existingEmail)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil

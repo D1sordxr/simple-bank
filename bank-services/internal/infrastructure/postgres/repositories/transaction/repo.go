@@ -4,23 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
 	converter "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/transaction"
-	"github.com/jackc/pgx/v5"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 )
 
 type Repository struct {
-	Conn *postgres.Pool
+	Executor *executor.Executor
 }
 
-func NewTransactionRepository(conn *postgres.Pool) *Repository {
-	return &Repository{Conn: conn}
+func NewTransactionRepository(executor *executor.Executor) *Repository {
+	return &Repository{Executor: executor}
 }
 
-func (r *Repository) Create(ctx context.Context, tx interface{}, transaction transaction.Aggregate) error {
+func (r *Repository) Create(ctx context.Context, transaction transaction.Aggregate) error {
 	const op = "postgres.TransactionRepository.Create"
 
-	conn := tx.(pgx.Tx)
+	conn := r.Executor.GetExecutor(ctx)
 
 	query := `INSERT INTO transactions (
         id, 

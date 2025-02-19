@@ -4,24 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/account"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres"
 	converters "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/converters/account"
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
 )
 
 type Repository struct {
-	Conn *postgres.Pool
+	Executor *executor.Executor
 }
 
-func NewAccountRepository(conn *postgres.Pool) *Repository {
-	return &Repository{Conn: conn}
+func NewAccountRepository(executor *executor.Executor) *Repository {
+	return &Repository{Executor: executor}
 }
 
-func (r *Repository) Create(ctx context.Context, tx interface{}, account account.Aggregate) error {
+func (r *Repository) Create(ctx context.Context, account account.Aggregate) error {
 	const op = "postgres.AccountRepository.Create"
 
-	conn := tx.(pgx.Tx)
+	conn := r.Executor.GetExecutor(ctx)
 
 	accountsQuery := `INSERT INTO accounts (
         id, 
@@ -52,13 +50,4 @@ func (r *Repository) Create(ctx context.Context, tx interface{}, account account
 	}
 
 	return nil
-}
-
-func (r *Repository) GetByID(ctx context.Context, accountID uuid.UUID) (account.Aggregate, error) {
-	const (
-		op  = "postgres.AccountRepository.GetByID"
-		msg = "not implemented"
-	)
-
-	return account.Aggregate{}, fmt.Errorf("%s: %s", op, msg)
 }
