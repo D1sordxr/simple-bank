@@ -51,6 +51,7 @@ func main() {
 
 	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
 	databaseExecutor := loadPosgresExecutor.NewExecutor(databasePool)
+
 	unitOfWork := loadPostgresUoW.NewUnitOfWork(logger, databaseExecutor)
 
 	eventRepository := loadPostgresEventRepo.NewEventRepository(databaseExecutor)

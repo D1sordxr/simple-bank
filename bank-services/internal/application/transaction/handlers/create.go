@@ -116,23 +116,23 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 	}
 
 	uow := h.deps.UnitOfWork
-	tx, err := uow.BeginSerializableTx()
+	ctx, err = uow.BeginWithTx(ctx)
 	if err != nil {
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			_ = uow.Rollback()
+			_ = uow.Rollback(ctx)
 			panic(r)
 		}
 		if err != nil {
 			log.Error(sharedExc.LogErrorAsString(err))
-			_ = uow.Rollback()
+			_ = uow.Rollback(ctx)
 		}
 	}()
 
-	if err = h.deps.TransactionRepository.Create(ctx, tx, transaction); err != nil {
+	if err = h.deps.TransactionRepository.Create(ctx, transaction); err != nil {
 		sharedExc.LogErrorAsString(err)
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -142,7 +142,7 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 		log.Error(sharedExc.LogEventCreationError(), sharedExc.LogError(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	if err = h.deps.EventRepository.SaveEvent(ctx, tx, txEvent); err != nil {
+	if err = h.deps.EventRepository.SaveEvent(ctx, txEvent); err != nil {
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -152,12 +152,12 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 		log.Error(sharedExc.LogOutboxCreationError(), sharedExc.LogError(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, tx, outboxEvent); err != nil {
+	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, outboxEvent); err != nil {
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	if err = uow.Commit(); err != nil {
+	if err = uow.Commit(ctx); err != nil {
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
