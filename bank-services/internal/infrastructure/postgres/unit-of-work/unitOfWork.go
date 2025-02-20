@@ -71,19 +71,17 @@ func (u *UnitOfWorkImpl) Commit(ctx context.Context) error {
 
 	if batchExecutor, ok := u.Executor.ExtractBatch(ctx); ok {
 		results := tx.SendBatch(ctx, batchExecutor.Batch)
-
-		defer func() {
-			if err := results.Close(); err != nil {
-				log.Error("Failed to close batch results", "error", err)
-			}
-		}()
-
 		for i := 0; i < batchExecutor.Batch.Len(); i++ {
 			_, err := results.Exec()
 			if err != nil {
-				log.Error("Batch execution failed", "error", err, "queryIndex", i)
-				return fmt.Errorf("%s: %w (query %d): %v", op, ErrCommitBatch, i, err)
+				log.Error("Batch execution failed", "error", err)
+				return fmt.Errorf("%s: %w: %v", op, ErrExecBatch, err)
 			}
+		}
+
+		if err := results.Close(); err != nil {
+			log.Error("Failed to close batch results", "error", err)
+			return fmt.Errorf("%s: %w: %v", op, ErrClosingBatch, err)
 		}
 
 		log.Info("Batch executed successfully")

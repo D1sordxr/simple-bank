@@ -8,5 +8,6 @@ var (
 	ErrCommitTx      = errors.New("failed to commit transaction")
 	ErrNoRollbackTx  = errors.New("no transaction to rollback")
 	ErrRollbackTx    = errors.New("failed to rollback tx")
-	ErrCommitBatch   = errors.New("error while committing batch")
+	ErrExecBatch     = errors.New("error while executing batch")
+	ErrClosingBatch  = errors.New("error while closing batch")
 )
