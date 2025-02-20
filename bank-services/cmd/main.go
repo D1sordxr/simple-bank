@@ -31,7 +31,7 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: UnitOfWork + Executor - add repo support -> implement and use in application services
+// TODO: UnitOfWork + Executor - add batch support
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
 // TODO: Transaction (aggregate) - add reversal type support
 

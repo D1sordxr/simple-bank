@@ -23,9 +23,9 @@ func NewUnitOfWork(
 	}
 }
 
-// BeginWithTxBatch TODO: finish the implementation of the method
-func (u *UnitOfWorkImpl) BeginWithTxBatch(ctx context.Context) (context.Context, error) {
-	const op = "postgres.UnitOfWork.BeginTxWithBatch"
+// BeginWithTxAndBatch TODO: finish the implementation of the method
+func (u *UnitOfWorkImpl) BeginWithTxAndBatch(ctx context.Context) (context.Context, error) {
+	const op = "postgres.UnitOfWork.BeginWithTxAndBatch"
 	log := u.Logger.With(u.Logger.String("operation", op))
 
 	log.Info("Starting new transaction with batch")
@@ -46,7 +46,7 @@ func (u *UnitOfWorkImpl) BeginWithTxBatch(ctx context.Context) (context.Context,
 }
 
 func (u *UnitOfWorkImpl) BeginWithTx(ctx context.Context) (context.Context, error) {
-	const op = "postgres.UnitOfWork.BeginTx"
+	const op = "postgres.UnitOfWork.BeginWithTx"
 	log := u.Logger.With(u.Logger.String("operation", op))
 
 	log.Info("Starting new transaction")
