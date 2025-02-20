@@ -28,6 +28,10 @@ func (l *Logger) String(key string, value string) slog.Attr {
 	return slog.String(key, value)
 }
 
+func (l *Logger) Int(key string, value int) slog.Attr {
+	return slog.Int(key, value)
+}
+
 func (l *Logger) Float64(key string, v float64) slog.Attr {
 	return slog.Float64(key, v)
 }

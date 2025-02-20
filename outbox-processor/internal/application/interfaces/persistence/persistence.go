@@ -10,14 +10,16 @@ type Logger interface {
 	Error(msg string, attrs ...any)
 	Debug(msg string, attrs ...any)
 	String(key string, value string) slog.Attr
+	Int(key string, value int) slog.Attr
 	Float64(key string, v float64) slog.Attr
 	Group(key string, args ...any) slog.Attr
 }
 
-type UoW interface {
-	Commit() error
-	Rollback() error
-	Begin() (interface{}, error)
+type UnitOfWork interface {
+	BeginWithTxAndBatch(ctx context.Context) (context.Context, error)
+	BeginWithTx(ctx context.Context) (context.Context, error)
+	Rollback(ctx context.Context) error
+	Commit(ctx context.Context) error
 }
 
 type Producer interface {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/commands"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/consts"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/interfaces"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/interfaces/persistence"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
@@ -16,20 +17,11 @@ import (
 	"time"
 )
 
-const (
-	StatusPending   = "Pending"
-	StatusProcessed = "Processed"
-	StatusFailed    = "Failed"
-
-	ClientAggregateType      = "Client"
-	AccountAggregateType     = "Account"
-	TransactionAggregateType = "Transaction"
-)
-
 type OutboxProcessor struct {
 	Logger          *loadLogger.Logger
 	OutboxCommand   interfaces.OutboxCommand
 	OutboxQuery     interfaces.OutboxQuery
+	UnitOfWork      persistence.UnitOfWork
 	KafkaProducer   persistence.Producer
 	Ticker          time.Duration
 	OutboxBatchSize int
@@ -38,12 +30,14 @@ type OutboxProcessor struct {
 func NewOutboxProcessor(
 	cfg *app.App,
 	log *loadLogger.Logger,
+	uow persistence.UnitOfWork,
 	c interfaces.OutboxCommand,
 	q interfaces.OutboxQuery,
 	producer persistence.Producer,
 ) *OutboxProcessor {
 	return &OutboxProcessor{
 		Logger:          log,
+		UnitOfWork:      uow,
 		OutboxCommand:   c,
 		OutboxQuery:     q,
 		KafkaProducer:   producer,
@@ -70,9 +64,13 @@ func (p *OutboxProcessor) ProcessOutbox(
 
 	log.Info("Starting processing outbox...")
 
-	// TODO: uow-v0.Begin()
-
 	messages, err := p.OutboxQuery.FetchMessages(ctx, q)
+	if err != nil {
+		return fmt.Errorf("%s, %w", op, err)
+	}
+
+	uow := p.UnitOfWork
+	ctx, err = uow.BeginWithTxAndBatch(ctx)
 	if err != nil {
 		return fmt.Errorf("%s, %w", op, err)
 	}
@@ -86,7 +84,7 @@ func (p *OutboxProcessor) ProcessOutbox(
 		c.ID = msg.OutboxID
 
 		if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
-			c.Status = StatusFailed
+			c.Status = consts.StatusFailed
 			if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
 				log.Error("Error updating outbox status", logger.String("outboxID", c.ID))
 				return fmt.Errorf("%s, %w", op, err)
@@ -95,7 +93,9 @@ func (p *OutboxProcessor) ProcessOutbox(
 		}
 	}
 
-	// TODO: uow-v0.Commit()
+	if err = uow.Commit(ctx); err != nil {
+		return fmt.Errorf("%s, %w", op, err)
+	}
 
 	log.Info("Outbox processed successfully!")
 
@@ -104,11 +104,11 @@ func (p *OutboxProcessor) ProcessOutbox(
 
 func (p *OutboxProcessor) processClientOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
-		Status: StatusProcessed,
+		Status: consts.StatusProcessed,
 	}
 	query := queries.OutboxQuery{
-		AggregateType: ClientAggregateType,
-		Status:        StatusPending,
+		AggregateType: consts.ClientAggregateType,
+		Status:        consts.StatusPending,
 		Limit:         p.OutboxBatchSize,
 	}
 
@@ -122,11 +122,11 @@ func (p *OutboxProcessor) processClientOutbox(ctx context.Context) error {
 
 func (p *OutboxProcessor) processAccountOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
-		Status: StatusProcessed,
+		Status: consts.StatusProcessed,
 	}
 	query := queries.OutboxQuery{
-		AggregateType: AccountAggregateType,
-		Status:        StatusPending,
+		AggregateType: consts.AccountAggregateType,
+		Status:        consts.StatusPending,
 		Limit:         p.OutboxBatchSize,
 	}
 
@@ -140,11 +140,11 @@ func (p *OutboxProcessor) processAccountOutbox(ctx context.Context) error {
 
 func (p *OutboxProcessor) processTransactionOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
-		Status: StatusProcessed,
+		Status: consts.StatusProcessed,
 	}
 	query := queries.OutboxQuery{
-		AggregateType: TransactionAggregateType,
-		Status:        StatusPending,
+		AggregateType: consts.TransactionAggregateType,
+		Status:        consts.StatusPending,
 		Limit:         p.OutboxBatchSize,
 	}
 
@@ -177,6 +177,14 @@ func (p *OutboxProcessor) Run() {
 		cancel()
 	}()
 
+	p.Logger.Info("Starting outbox processor...",
+		p.Logger.Group("parameters",
+			p.Logger.Float64("ticker", p.Ticker.Seconds()),
+			p.Logger.Int("batchSize", p.OutboxBatchSize),
+		),
+	)
+
+	// Main loop
 	for {
 		select {
 		case <-ctx.Done():
@@ -224,7 +232,7 @@ func (p *OutboxProcessor) Run() {
 		case err := <-errorsChannel:
 			p.Logger.Error("Application encountered an error", p.Logger.String("error", err.Error()))
 
-			// cancel()
+			// TODO: cancel() will trigger the context cancellation for critical errors
 		}
 	}
 }

@@ -9,10 +9,10 @@ import (
 	loadKafka "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka"
 	loadPostgres "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres"
 	loadPostgresDAO "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/dao"
+	loadExecutor "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/executor"
+	loadUoW "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/postgres/unit-of-work"
 	loadApp "github.com/D1sordxr/simple-bank/outbox-processor/internal/presentation"
 )
-
-// TODO: transaction + batch (implement using context with value)
 
 func main() {
 	cfg := loadConfig.NewConfig()
@@ -20,13 +20,18 @@ func main() {
 	slogLogger := loadSlogHandler.NewSlogLogger(cfg)
 	logger := loadLogger.NewLogger(slogLogger)
 
-	databaseConn := loadPostgres.NewConnection(&cfg.StorageConfig)
+	_ = loadPostgres.NewConnection(&cfg.StorageConfig)
+	databasePool := loadPostgres.NewPool(&cfg.StorageConfig)
+	databaseExecutor := loadExecutor.NewExecutor(databasePool)
 
-	outboxDAO := loadPostgresDAO.NewOutboxDAO(databaseConn)
+	unitOfWork := loadUoW.NewUnitOfWork(logger, databaseExecutor)
+
+	outboxDAO := loadPostgresDAO.NewOutboxDAO(databaseExecutor)
 
 	storage := loadStorage.NewStorage(
-		outboxDAO, // write dao implementation
-		outboxDAO, // read dao implementation
+		unitOfWork, // unitOfWork implementation
+		outboxDAO,  // write dao implementation
+		outboxDAO,  // read dao implementation
 	)
 
 	kafkaProducer := loadKafka.NewProducer(&cfg.KafkaConfig)
@@ -34,6 +39,7 @@ func main() {
 	processorService := loadService.NewOutboxProcessor(
 		&cfg.AppConfig,
 		logger,
+		storage.UnitOfWork,
 		storage.OutboxCommandDAO,
 		storage.OutboxQueryDAO,
 		kafkaProducer,
