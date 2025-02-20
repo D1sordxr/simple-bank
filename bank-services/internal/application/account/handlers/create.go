@@ -67,16 +67,7 @@ func (h *CreateAccountHandler) Handle(ctx context.Context, c commands.CreateAcco
 		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
-			panic(r)
-		}
-		if err != nil {
-			log.Error(sharedExceptions.LogErrorAsString(err))
-			_ = uow.Rollback(ctx)
-		}
-	}()
+	defer uow.GracefulRollback(ctx, &err)
 
 	if err = h.deps.AccountRepository.Create(ctx, account); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))

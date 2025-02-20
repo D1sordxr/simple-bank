@@ -121,16 +121,7 @@ func (h *CreateTransactionHandler) Handle(ctx context.Context,
 		log.Error(sharedExc.LogErrorAsString(err))
 		return commands.CreateTransactionDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
-			panic(r)
-		}
-		if err != nil {
-			log.Error(sharedExc.LogErrorAsString(err))
-			_ = uow.Rollback(ctx)
-		}
-	}()
+	defer uow.GracefulRollback(ctx, &err)
 
 	if err = h.deps.TransactionRepository.Create(ctx, transaction); err != nil {
 		sharedExc.LogErrorAsString(err)

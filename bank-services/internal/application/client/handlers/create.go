@@ -69,19 +69,9 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	uow := h.deps.UnitOfWork
 	ctx, err = uow.BeginWithTxAndBatch(ctx)
 	if err != nil {
-		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			_ = uow.Rollback(ctx)
-			panic(r)
-		}
-		if err != nil {
-			log.Error(sharedExceptions.LogErrorAsString(err))
-			_ = uow.Rollback(ctx)
-		}
-	}()
+	defer uow.GracefulRollback(ctx, &err)
 
 	err = h.deps.ClientRepository.Create(ctx, client)
 	if err != nil {
@@ -106,10 +96,10 @@ func (h *CreateClientHandler) Handle(ctx context.Context, c commands.CreateClien
 	}
 	if err = h.deps.OutboxRepository.SaveOutboxEvent(ctx, outboxEvent); err != nil {
 		log.Error(sharedExceptions.LogErrorAsString(err))
+		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = uow.Commit(ctx); err != nil {
-		log.Error(sharedExceptions.LogErrorAsString(err))
 		return commands.CreateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 

@@ -74,6 +74,7 @@ func (p *OutboxProcessor) ProcessOutbox(
 	if err != nil {
 		return fmt.Errorf("%s, %w", op, err)
 	}
+	defer uow.GracefulRollback(ctx, &err)
 
 	for _, msg := range messages {
 		err = p.KafkaProducer.SendMessage(ctx, []byte(msg.OutboxID), []byte(msg.MessagePayload))

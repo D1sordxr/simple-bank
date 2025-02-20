@@ -30,7 +30,7 @@ func (u *UnitOfWorkImpl) BeginWithTxAndBatch(ctx context.Context) (context.Conte
 
 	tx, err := u.Executor.Begin(ctx)
 	if err != nil {
-		log.Error("Failed to start transaction", "error", err)
+		log.Error("Failed to start transaction", "error", err.Error())
 		return ctx, fmt.Errorf("%s: %w: %v", op, ErrTxStartFailed, err)
 	}
 
@@ -50,7 +50,7 @@ func (u *UnitOfWorkImpl) BeginWithTx(ctx context.Context) (context.Context, erro
 
 	tx, err := u.Executor.Begin(ctx)
 	if err != nil {
-		log.Error("Failed to start transaction", "error", err)
+		log.Error("Failed to start transaction", "error", err.Error())
 		return ctx, fmt.Errorf("%s: %w: %v", op, ErrTxStartFailed, err)
 	}
 
@@ -74,13 +74,13 @@ func (u *UnitOfWorkImpl) Commit(ctx context.Context) error {
 		for i := 0; i < batchExecutor.Batch.Len(); i++ {
 			_, err := results.Exec()
 			if err != nil {
-				log.Error("Batch execution failed", "error", err)
+				log.Error("Batch execution failed", "error", err.Error())
 				return fmt.Errorf("%s: %w: %v", op, ErrExecBatch, err)
 			}
 		}
 
 		if err := results.Close(); err != nil {
-			log.Error("Failed to close batch results", "error", err)
+			log.Error("Failed to close batch results", "error", err.Error())
 			return fmt.Errorf("%s: %w: %v", op, ErrClosingBatch, err)
 		}
 
@@ -88,7 +88,7 @@ func (u *UnitOfWorkImpl) Commit(ctx context.Context) error {
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Error("Failed to commit transaction", "error", err)
+		log.Error("Failed to commit transaction", "error", err.Error())
 		return fmt.Errorf("%s: %w: %v", op, ErrCommitTx, err)
 	}
 
@@ -107,10 +107,26 @@ func (u *UnitOfWorkImpl) Rollback(ctx context.Context) error {
 	}
 
 	if err := tx.Rollback(ctx); err != nil {
-		log.Error("Failed to rollback transaction", "error", err)
+		log.Error("Failed to rollback transaction", "error", err.Error())
 		return fmt.Errorf("%s: %w: %v", op, ErrRollbackTx, err)
 	}
 
 	log.Info("Transaction rolled back")
 	return nil
+}
+
+func (u *UnitOfWorkImpl) GracefulRollback(ctx context.Context, err *error) {
+	const op = "postgres.UnitOfWork.GracefulRollback"
+	log := u.Logger.With(u.Logger.String("operation", op))
+
+	if r := recover(); r != nil {
+		_ = u.Rollback(ctx)
+		log.Error("Panic occurred, transaction rolled back", "panic", r)
+		panic(r)
+	}
+
+	if err != nil && *err != nil {
+		log.Error("Error occurred, transaction rolled back", "error", *err)
+		_ = u.Rollback(ctx)
+	}
 }
