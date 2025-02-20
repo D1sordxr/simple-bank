@@ -31,7 +31,7 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: UnitOfWork + Executor - add batch support
+// TODO: UnitOfWork + Executor - complete batch support
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
 // TODO: Transaction (aggregate) - add reversal type support
 
@@ -41,7 +41,6 @@ import (
 // TODO: Redis for caching client and account data
 
 // TODO: Money - rework float64 -> decimal.Decimal from shopspring library (optional)
-// TODO: Postgres - rework connection -> pool (optional)
 
 func main() {
 	cfg := loadConfig.NewConfig()

@@ -15,11 +15,18 @@ type IExecutor interface {
 	CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error)
 }
 
+type (
+	txKey    struct{}
+	batchKey struct{}
+)
+
 type Executor struct {
 	*postgres.Pool
 }
 
-type txKey struct{}
+func NewExecutor(pool *postgres.Pool) *Executor {
+	return &Executor{Pool: pool}
+}
 
 func (e *Executor) InjectTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, txKey{}, tx)
@@ -30,13 +37,27 @@ func (e *Executor) ExtractTx(ctx context.Context) (pgx.Tx, bool) {
 	return tx, ok
 }
 
-func NewExecutor(pool *postgres.Pool) *Executor {
-	return &Executor{Pool: pool}
+func (e *Executor) NewBatch() *BatchExecutor {
+	return &BatchExecutor{Batch: &pgx.Batch{}}
+}
+
+func (e *Executor) InjectBatch(ctx context.Context, batch *BatchExecutor) context.Context {
+	return context.WithValue(ctx, batchKey{}, batch)
+}
+
+func (e *Executor) ExtractBatch(ctx context.Context) (*BatchExecutor, bool) {
+	batch, ok := ctx.Value(batchKey{}).(*BatchExecutor)
+	return batch, ok
 }
 
 func (e *Executor) GetExecutor(ctx context.Context) IExecutor {
+	if batch, ok := e.ExtractBatch(ctx); ok {
+		return batch
+	}
+
 	if tx, ok := e.ExtractTx(ctx); ok {
 		return tx
 	}
+
 	return e.Pool
 }

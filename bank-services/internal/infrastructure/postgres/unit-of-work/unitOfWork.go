@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/executor"
-	"github.com/jackc/pgx/v5"
 )
 
 type UnitOfWorkImpl struct {
@@ -23,7 +22,6 @@ func NewUnitOfWork(
 	}
 }
 
-// BeginWithTxAndBatch TODO: finish the implementation of the method
 func (u *UnitOfWorkImpl) BeginWithTxAndBatch(ctx context.Context) (context.Context, error) {
 	const op = "postgres.UnitOfWork.BeginWithTxAndBatch"
 	log := u.Logger.With(u.Logger.String("operation", op))
@@ -36,11 +34,10 @@ func (u *UnitOfWorkImpl) BeginWithTxAndBatch(ctx context.Context) (context.Conte
 		return ctx, fmt.Errorf("%s: %w: %v", op, ErrTxStartFailed, err)
 	}
 
-	batch := &pgx.Batch{}
-	_ = batch
+	batch := u.Executor.NewBatch()
 
-	// TODO: implement the logic for injecting the batch into the transaction
 	ctx = u.Executor.InjectTx(ctx, tx)
+	ctx = u.Executor.InjectBatch(ctx, batch)
 
 	return ctx, nil
 }
@@ -70,6 +67,26 @@ func (u *UnitOfWorkImpl) Commit(ctx context.Context) error {
 	if !ok {
 		log.Error("No transaction to commit")
 		return fmt.Errorf("%s: %w", op, ErrNoCommitTx)
+	}
+
+	if batchExecutor, ok := u.Executor.ExtractBatch(ctx); ok {
+		results := tx.SendBatch(ctx, batchExecutor.Batch)
+
+		defer func() {
+			if err := results.Close(); err != nil {
+				log.Error("Failed to close batch results", "error", err)
+			}
+		}()
+
+		for i := 0; i < batchExecutor.Batch.Len(); i++ {
+			_, err := results.Exec()
+			if err != nil {
+				log.Error("Batch execution failed", "error", err, "queryIndex", i)
+				return fmt.Errorf("%s: %w (query %d): %v", op, ErrCommitBatch, i, err)
+			}
+		}
+
+		log.Info("Batch executed successfully")
 	}
 
 	if err := tx.Commit(ctx); err != nil {
