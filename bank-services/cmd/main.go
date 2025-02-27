@@ -31,12 +31,14 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
+// TODO: UpdateCommands - add update client and account commands (executes event + outbox)
+
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
 // TODO: Transaction (aggregate) - add reversal type support
 
 // TODO: Workers...
 // TODO: Outbox reader and Kafka producer service
-// TODO: Kafka consumer services to process transaction
+// TODO: Kafka consumer services to process transaction and updating client and account data
 // TODO: Redis for caching client and account data
 
 // TODO: Money - rework float64 -> decimal.Decimal from shopspring library (optional)

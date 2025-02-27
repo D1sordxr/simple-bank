@@ -14,13 +14,14 @@ import (
 	loadApp "github.com/D1sordxr/simple-bank/outbox-processor/internal/presentation"
 )
 
+// TODO: Kafka - SendMessage method improvement
+
 func main() {
 	cfg := loadConfig.NewConfig()
 
 	slogLogger := loadSlogHandler.NewSlogLogger(cfg)
 	logger := loadLogger.NewLogger(slogLogger)
 
-	_ = loadPostgres.NewConnection(&cfg.StorageConfig)
 	databasePool := loadPostgres.NewPool(&cfg.StorageConfig)
 	databaseExecutor := loadExecutor.NewExecutor(databasePool)
 

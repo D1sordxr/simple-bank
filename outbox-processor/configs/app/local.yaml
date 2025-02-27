@@ -12,5 +12,6 @@ storage:
   migration: true
 
 kafka:
+  topic: "outbox-events"
   brokers:
     - "kafka:9092"
