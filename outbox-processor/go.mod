@@ -3,6 +3,7 @@ module github.com/D1sordxr/simple-bank/outbox-processor
 go 1.23rc2
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/fatih/color v1.18.0
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
