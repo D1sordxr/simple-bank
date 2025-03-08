@@ -68,6 +68,10 @@ func (p *OutboxProcessor) ProcessOutbox(
 	if err != nil {
 		return fmt.Errorf("%s, %w", op, err)
 	}
+	if len(messages) == 0 {
+		log.Info("No messages to process")
+		return nil
+	}
 
 	uow := p.UnitOfWork
 	ctx, err = uow.BeginWithTxAndBatch(ctx)
