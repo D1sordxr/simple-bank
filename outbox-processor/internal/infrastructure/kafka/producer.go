@@ -13,14 +13,19 @@ type Producer struct {
 func NewProducer(config *config.KafkaConfig) *Producer {
 	writer := &kafka.Writer{
 		Addr:     kafka.TCP(config.Brokers...),
-		Topic:    config.Topic,
 		Balancer: &kafka.LeastBytes{},
 	}
 	return &Producer{Writer: writer}
 }
 
-func (p *Producer) SendMessage(ctx context.Context, key, value []byte) error {
+func (p *Producer) SendMessage(
+	ctx context.Context,
+	key,
+	value []byte,
+	topic string,
+) error {
 	return p.Writer.WriteMessages(ctx, kafka.Message{
+		Topic: topic,
 		Key:   key,
 		Value: value,
 	})

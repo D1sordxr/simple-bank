@@ -1,0 +1,17 @@
+app:
+  mode: "local"
+
+storage:
+  host: "postgres"
+  user: "postgres"
+  password: "rootroot"
+  port: 5432
+  database: "BankApp"
+  migration: true
+
+grpc:
+  port: 44044
+  timeout: 5s
+  time: 15m
+  max_connection_idle: 5m
+  max_connection_age: 5m
