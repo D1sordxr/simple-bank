@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	// TODO: Monorepo in bank-services for sharing domain
+
 	// TODO: v0.1.2 packages - add yaml config support
 
 	cfg := app.NewConfig()

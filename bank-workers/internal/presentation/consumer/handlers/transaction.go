@@ -1,11 +1,20 @@
 package handlers
 
-type TransactionProcessor struct{}
+import "LearningArch/bank-workers/internal/application/transaction"
 
-func (t *TransactionProcessor) Process(msg []byte) {
-	//
+type TransactionProcessor struct {
+	transactionSvc transaction.ProcessTransaction
 }
 
-func parseMessage(msg []byte) {
-	//
+func NewTransactionProcessor(transactionSvc transaction.ProcessTransaction) *TransactionProcessor {
+	return &TransactionProcessor{transactionSvc: transactionSvc}
+}
+
+func (t *TransactionProcessor) Process(msg []byte) {
+	data := transaction.ProcessDTO{ByteData: msg}
+
+	err := t.transactionSvc.Handle(data)
+	if err != nil {
+		// log error
+	}
 }
