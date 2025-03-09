@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o bank-services ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bank-services ./cmd/command-query-service/main.go
 
 FROM alpine:latest
 
