@@ -61,3 +61,18 @@ func NewTransaction(
 		UpdatedAt:            time.Now(),
 	}, nil
 }
+
+// DTO TODO: use for db saving and kafka producing/consuming
+type DTO struct {
+	TransactionID        string  `json:"transaction_id"`
+	SourceAccountID      *string `json:"source_account_id,omitempty"`
+	DestinationAccountID *string `json:"destination_account_id,omitempty"`
+	CurrencyCode         string  `json:"currency"`
+	Amount               float64 `json:"amount"`
+	Status               string  `json:"transaction_status"`
+	Type                 string  `json:"type"`
+	Description          string  `json:"description,omitempty"`
+	FailureReason        *string `json:"failure_reason,omitempty"`
+	CreatedAt            string  `json:"created_at"`
+	UpdatedAt            string  `json:"updated_at"`
+}
