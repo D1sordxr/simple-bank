@@ -6,10 +6,6 @@ import (
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
 )
 
-type ProcessTransaction interface {
-	Handle(ctx context.Context, dto dto.ProcessDTO) error
-}
-
 type ProcessTransactionDAO interface {
 	SetProcessed(ctx context.Context, msgID string) error
 	IsProcessed(ctx context.Context, msgID string) (bool, error)

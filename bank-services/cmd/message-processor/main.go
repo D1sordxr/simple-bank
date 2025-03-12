@@ -33,17 +33,17 @@ func main() {
 		return
 	}
 
-	// TODO: producer fixes
-	txMsgProcessor := handlers.NewProcessTransactionHandler(
+	// TODO: packages - producer fixes
+	txMsgProcessor := handlers.NewProcessTransactionHandler( // TODO: send topic as arg
 		txMsgDAO,
 		producer,
 		new(services.ProcessDomainSvc),
 	)
 
 	// TODO: v0.1.2 packages - read message method for consumer (?)
-	consumer := pkgConsumer.NewConsumer(&cfg.Consumer)
+	txConsumer := pkgConsumer.NewConsumer(&cfg.Consumer) // TODO: send topic as arg
 
-	_, _, _, _ = log, pool, consumer, producer
+	_, _, _, _ = log, pool, txConsumer, producer
 
 	// TODO: app.Run()
 }
