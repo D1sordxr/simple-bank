@@ -2,27 +2,29 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
+	sharedInterfaces "github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dto"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/interfaces"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/consts"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event/account"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/exceptions"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/services"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/vo"
 )
 
 type ProcessTransactionHandler struct {
-	producer interfaces.Producer
-	svc      services.IProcessDomainSvc
+	dao      interfaces.ProcessTransactionDAO
+	svc      interfaces.ProcessDomainSvc
+	producer sharedInterfaces.Producer
 }
 
 func NewProcessTransactionHandler(
-	producer interfaces.Producer,
-	svc services.IProcessDomainSvc,
+	dao interfaces.ProcessTransactionDAO,
+	producer sharedInterfaces.Producer,
+	svc interfaces.ProcessDomainSvc,
 ) *ProcessTransactionHandler {
 	return &ProcessTransactionHandler{
+		dao:      dao,
 		producer: producer,
 		svc:      svc,
 	}
@@ -30,12 +32,18 @@ func NewProcessTransactionHandler(
 
 func (h *ProcessTransactionHandler) Handle(ctx context.Context, dto dto.ProcessDTO) error {
 	const op = "Services.TransactionService.ProcessTransaction"
-	// log start
+	// TODO: log start
 
-	agg, err := h.svc.ParseMessage(dto.ByteData)
+	outboxID, agg, err := h.svc.ParseMessage(dto)
 	if err != nil {
-		// log
+		// TODO: log err
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	processed, err := h.dao.IsProcessed(ctx, outboxID)
+	if processed {
+		// TODO: log msg already processed
+		return nil
 	}
 
 	messages := make([]account.UpdateEvent, 0, 2)
@@ -67,22 +75,33 @@ func (h *ProcessTransactionHandler) Handle(ctx context.Context, dto dto.ProcessD
 			},
 		)
 	case vo.ReversalType: // TODO: support in main service
-		return fmt.Errorf("%s: ReversalType is not implemented", op)
+		// TODO: log
+		return fmt.Errorf("%s: reversal transaction is not supported", op)
 	default:
+		// TODO: log
 		return fmt.Errorf("%s: %w", op, exceptions.InvalidTxType)
 	}
 
 	for _, msg := range messages {
-		payload, err := json.Marshal(msg)
+		payload, err := h.svc.MarshalMessage(msg)
 		if err != nil {
+			// TODO: log
 			return fmt.Errorf("%s: %w", op, err)
 		}
 
 		err = h.producer.SendMessage(ctx, nil, payload)
 		if err != nil {
-			return fmt.Errorf("%s: я%w", op, err)
+			// TODO: log
+			return fmt.Errorf("%s: %w", op, err)
 		}
 	}
+
+	if err = h.dao.SetProcessed(ctx, outboxID); err != nil {
+		// TODO: log
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	// TODO: log processed successfully
 
 	return nil
 }

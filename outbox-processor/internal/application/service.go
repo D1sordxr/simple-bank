@@ -10,6 +10,7 @@ import (
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/application/queries"
 	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app"
 	loadLogger "github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/app/logger"
+	"github.com/D1sordxr/simple-bank/outbox-processor/internal/infrastructure/kafka/config"
 	"os"
 	"os/signal"
 	"sync"
@@ -23,12 +24,13 @@ type OutboxProcessor struct {
 	OutboxQuery     interfaces.OutboxQuery
 	UnitOfWork      persistence.UnitOfWork
 	KafkaProducer   persistence.Producer
-	Ticker          time.Duration
+	KafkaTopics     config.Topics
 	OutboxBatchSize int
+	Ticker          time.Duration
 }
 
 func NewOutboxProcessor(
-	cfg *app.App,
+	cfg *app.Config,
 	log *loadLogger.Logger,
 	uow persistence.UnitOfWork,
 	c interfaces.OutboxCommand,
@@ -41,8 +43,9 @@ func NewOutboxProcessor(
 		OutboxCommand:   c,
 		OutboxQuery:     q,
 		KafkaProducer:   producer,
-		Ticker:          cfg.Ticker,
-		OutboxBatchSize: cfg.OutboxBatchSize,
+		KafkaTopics:     cfg.KafkaConfig.Topics,
+		Ticker:          cfg.AppConfig.Ticker,
+		OutboxBatchSize: cfg.AppConfig.OutboxBatchSize,
 	}
 }
 
@@ -81,20 +84,20 @@ func (p *OutboxProcessor) ProcessOutbox(
 	defer uow.GracefulRollback(ctx, &err)
 
 	for _, msg := range messages {
-		err = p.KafkaProducer.SendMessage(ctx, []byte(msg.OutboxID), []byte(msg.MessagePayload))
+		err = p.KafkaProducer.SendMessage(ctx, c.Topic, []byte(msg.OutboxID), []byte(msg.MessagePayload))
 		if err != nil {
 			log.Error("Error producing kafka messages")
 			return fmt.Errorf("%s, %w", op, err)
 		}
-		c.ID = msg.OutboxID
 
+		c.ID = msg.OutboxID
 		if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
 			c.Status = consts.StatusFailed
 			if err = p.OutboxCommand.UpdateStatus(ctx, c); err != nil {
-				log.Error("Error updating outbox status", logger.String("outboxID", c.ID))
+				log.Error("Error updating outbox status", logger.String("outboxID", msg.OutboxID))
 				return fmt.Errorf("%s, %w", op, err)
 			}
-			log.Error("Outbox received status failed", logger.String("outboxID", c.ID))
+			log.Error("Outbox received status failed", logger.String("outboxID", msg.OutboxID))
 		}
 	}
 
@@ -110,6 +113,7 @@ func (p *OutboxProcessor) ProcessOutbox(
 func (p *OutboxProcessor) processClientOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: consts.StatusProcessed,
+		Topic:  p.KafkaTopics.ClientCreatedEvent,
 	}
 	query := queries.OutboxQuery{
 		AggregateType: consts.ClientAggregateType,
@@ -128,6 +132,7 @@ func (p *OutboxProcessor) processClientOutbox(ctx context.Context) error {
 func (p *OutboxProcessor) processAccountOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: consts.StatusProcessed,
+		Topic:  p.KafkaTopics.AccountCreatedEvent,
 	}
 	query := queries.OutboxQuery{
 		AggregateType: consts.AccountAggregateType,
@@ -146,6 +151,7 @@ func (p *OutboxProcessor) processAccountOutbox(ctx context.Context) error {
 func (p *OutboxProcessor) processTransactionOutbox(ctx context.Context) error {
 	command := commands.OutboxCommand{
 		Status: consts.StatusProcessed,
+		Topic:  p.KafkaTopics.TransactionCreatedEvent,
 	}
 	query := queries.OutboxQuery{
 		AggregateType: consts.TransactionAggregateType,

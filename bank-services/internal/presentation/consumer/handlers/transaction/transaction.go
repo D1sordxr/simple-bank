@@ -1,19 +1,27 @@
 package transaction
 
-import "LearningArch/bank-workers/internal/application/transaction"
+import (
+	"context"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dto"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/interfaces"
+	"github.com/segmentio/kafka-go"
+)
 
-type TransactionProcessor struct {
-	transactionSvc transaction.ProcessTransaction
+type ProcessorConsumer struct {
+	svc interfaces.ProcessTransaction
 }
 
-func NewTransactionProcessor(transactionSvc transaction.ProcessTransaction) *TransactionProcessor {
-	return &TransactionProcessor{transactionSvc: transactionSvc}
+func NewTransactionProcessor(svc interfaces.ProcessTransaction) *ProcessorConsumer {
+	return &ProcessorConsumer{svc: svc}
 }
 
-func (t *TransactionProcessor) Process(msg []byte) {
-	data := transaction.ProcessDTO{ByteData: msg}
+func (c *ProcessorConsumer) Process(ctx context.Context, msg kafka.Message) {
+	data := dto.ProcessDTO{
+		OutboxID: msg.Key,
+		Data:     msg.Value,
+	}
 
-	err := t.transactionSvc.Handle(data)
+	err := c.svc.Handle(data)
 	if err != nil {
 		// log error
 	}

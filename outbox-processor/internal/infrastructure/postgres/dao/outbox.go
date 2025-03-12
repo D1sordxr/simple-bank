@@ -26,12 +26,12 @@ func (dao *OutboxDAO) FetchMessages(ctx context.Context, q queries.OutboxQuery) 
 	conn := dao.Executor.GetExecutor(ctx)
 
 	query := `SELECT id, aggregate_id, aggregate_type, message_type, message_payload, status, created_at
-				FROM outbox
-				WHERE status = $1
-				ORDER BY created_at
-				LIMIT $2`
+          FROM outbox
+          WHERE status = $1 AND aggregate_type = $2
+          ORDER BY created_at
+          LIMIT $3`
 
-	rows, err := conn.Query(ctx, query, q.Status, q.Limit)
+	rows, err := conn.Query(ctx, query, q.Status, q.AggregateType, q.Limit)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return queries.OutboxDTOs{}, nil

@@ -24,6 +24,6 @@ type UnitOfWork interface {
 }
 
 type Producer interface {
-	SendMessage(ctx context.Context, key, value []byte) error
+	SendMessage(ctx context.Context, topic string, key []byte, value []byte) error
 	Close() error
 }

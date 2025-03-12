@@ -3,24 +3,27 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dto"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction"
 )
 
-type IProcessDomainSvc interface {
-	ParseMessage(msg []byte) (transaction.Aggregate, error)
-}
-
 type ProcessDomainSvc struct{}
 
-func (ProcessDomainSvc) ParseMessage(msg []byte) (transaction.Aggregate, error) {
+func (ProcessDomainSvc) ParseMessage(dto dto.ProcessDTO) (string, transaction.Aggregate, error) {
 	const op = "domain.transaction.ProcessDomainSvc.ParseMessage"
 
 	var agg transaction.Aggregate
 
-	err := json.Unmarshal(msg, &agg)
+	err := json.Unmarshal(dto.Data, &agg)
 	if err != nil {
-		return transaction.Aggregate{}, fmt.Errorf("%s: %w: %w", op, ErrParsingMsg, err)
+		return "", transaction.Aggregate{}, fmt.Errorf("%s: %w: %w", op, ErrParsingMsg, err)
 	}
 
-	return agg, nil
+	outboxID := string(dto.OutboxID)
+
+	return outboxID, agg, nil
+}
+
+func (ProcessDomainSvc) MarshalMessage(msg any) ([]byte, error) {
+	return json.Marshal(msg)
 }

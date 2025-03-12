@@ -20,9 +20,9 @@ func NewProducer(config *config.KafkaConfig) *Producer {
 
 func (p *Producer) SendMessage(
 	ctx context.Context,
-	key,
-	value []byte,
 	topic string,
+	key []byte,
+	value []byte,
 ) error {
 	return p.Writer.WriteMessages(ctx, kafka.Message{
 		Topic: topic,

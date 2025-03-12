@@ -10,15 +10,14 @@ import (
 	"os"
 )
 
-const BasicConfigPath = "./configs/app/local.yaml"
-
 type Config struct {
-	App         App             `yaml:"app"`
-	Logger      log.Config      `yaml:"logger"`
-	Storage     postgres.Config `yaml:"storage"`
-	Consumer    consumer.Config `yaml:"consumer"`
-	Producer    producer.Config `yaml:"producer"`
-	KafkaTopics kafka.Topics    `yaml:"kafka_topics"`
+	App            App             `yaml:"app"`
+	Logger         log.Config      `yaml:"logger"`
+	Storage        postgres.Config `yaml:"storage"`
+	Consumer       consumer.Config `yaml:"consumer"`
+	ConsumerTopics kafka.Topics    `yaml:"consumer_topics"`
+	Producer       producer.Config `yaml:"producer"`
+	ProducerTopics kafka.Topics    `yaml:"producer_topics"`
 }
 
 type App struct {
@@ -30,7 +29,7 @@ func NewConfig() *Config {
 
 	path := os.Getenv("CONFIG_PATH")
 	if path == "" {
-		path = BasicConfigPath
+		panic("failed to read config: no path to config")
 	}
 
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {

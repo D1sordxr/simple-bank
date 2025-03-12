@@ -1,5 +1,6 @@
 package dto
 
 type ProcessDTO struct {
-	ByteData []byte
+	OutboxID []byte
+	Data     []byte
 }

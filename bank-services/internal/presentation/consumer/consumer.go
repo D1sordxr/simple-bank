@@ -14,12 +14,14 @@ type Consumer struct {
 func NewConsumer(
 	config *consumer.Config,
 ) *Consumer {
+
 	return &Consumer{
 		Reader: consumer.NewConsumer(config),
 	}
 }
 
 func (c *Consumer) Run() {
+
 	for {
 		msg, err := c.ReadMessage(context.Background())
 		if err != nil {
@@ -27,6 +29,6 @@ func (c *Consumer) Run() {
 			continue
 		}
 
-		go handleMessage(msg.Value)
+		go handleMessage(msg)
 	}
 }
