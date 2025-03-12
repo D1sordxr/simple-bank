@@ -1,7 +1,6 @@
 package main
 
 import (
-	pkgConsumer "github.com/D1sordxr/packages/kafka/consumer"
 	pkgProducer "github.com/D1sordxr/packages/kafka/producer"
 	pkgLog "github.com/D1sordxr/packages/log"
 	pkgPostgres "github.com/D1sordxr/packages/postgres"
@@ -10,6 +9,9 @@ import (
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/services"
 	loadConfig "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/config-v2"
 	loadPostgresProcMsg "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/dao/processed-messages"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/consumer"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/consumer/handlers/transaction"
 )
 
 func main() {
@@ -34,16 +36,19 @@ func main() {
 	}
 
 	// TODO: packages - producer fixes
-	txMsgProcessor := handlers.NewProcessTransactionHandler( // TODO: send topic as arg
+	txMsgProcessorSvc := handlers.NewProcessTransactionHandler( // TODO: send topic as arg
 		txMsgDAO,
 		producer,
 		new(services.ProcessDomainSvc),
 	)
 
+	txMsgProcessor := transaction.NewTransactionProcessor(txMsgProcessorSvc)
 	// TODO: v0.1.2 packages - read message method for consumer (?)
-	txConsumer := pkgConsumer.NewConsumer(&cfg.Consumer) // TODO: send topic as arg
+	txConsumer := consumer.NewConsumer(&cfg.Consumer, txMsgProcessor) // TODO: send topic as arg
 
-	_, _, _, _ = log, pool, txConsumer, producer
-
-	// TODO: app.Run()
+	server := consumer.NewServer(
+		txConsumer,
+	)
+	app := presentation.NewApp(server)
+	app.RunApp()
 }
