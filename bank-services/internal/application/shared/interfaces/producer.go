@@ -1,8 +1,7 @@
 package interfaces
 
-import "context"
+import "github.com/D1sordxr/packages/kafka/producer"
 
 type Producer interface {
-	SendMessage(ctx context.Context, key, value []byte) error
-	Close() error
+	producer.IProducer
 }

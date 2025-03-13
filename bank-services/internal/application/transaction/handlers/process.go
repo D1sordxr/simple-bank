@@ -13,55 +13,71 @@ import (
 )
 
 type ProcessTransactionHandler struct {
-	dao      interfaces.ProcessTransactionDAO
-	svc      interfaces.ProcessDomainSvc
-	producer sharedInterfaces.Producer
+	log           sharedInterfaces.Logger
+	producer      sharedInterfaces.Producer
+	producerTopic string
+	dao           interfaces.ProcessTransactionDAO
+	svc           interfaces.ProcessDomainSvc
 }
 
 func NewProcessTransactionHandler(
-	dao interfaces.ProcessTransactionDAO,
+	log sharedInterfaces.Logger,
 	producer sharedInterfaces.Producer,
+	topic string,
+	dao interfaces.ProcessTransactionDAO,
 	svc interfaces.ProcessDomainSvc,
 ) *ProcessTransactionHandler {
 	return &ProcessTransactionHandler{
-		dao:      dao,
-		producer: producer,
-		svc:      svc,
+		log:           log,
+		dao:           dao,
+		producerTopic: topic,
+		producer:      producer,
+		svc:           svc,
 	}
 }
 
 func (h *ProcessTransactionHandler) Process(ctx context.Context, dto dto.ProcessDTO) error {
 	const op = "Services.TransactionService.ProcessTransaction"
-	// TODO: log start
+
+	h.log.Info("Attempting to process message...")
 
 	outboxID, agg, err := h.svc.ParseMessage(dto)
 	if err != nil {
-		// TODO: log err
+		h.log.Errorw("Error parsing message", "error", err.Error())
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	processed, err := h.dao.IsProcessed(ctx, outboxID)
-	if processed {
-		// TODO: log msg already processed
+	switch {
+	case err != nil:
+		h.log.Errorw("Error checking message status",
+			"error", err.Error(),
+			"outboxID", outboxID,
+		)
+		return fmt.Errorf("%s: %w", op, err)
+	case processed:
+		h.log.Infow("Message already processed", "outboxID", outboxID)
 		return nil
 	}
 
-	messages := make([]account.UpdateEvent, 0, 2)
+	h.log.Infow("Start processing message", "outboxID", outboxID)
+
+	messages := make(account.UpdateEvents, 0, 2)
 
 	switch agg.Type.Value {
-	case vo.DepositType: // sends one account update
+	case vo.DepositType: // sends one account update event
 		messages = append(messages, account.UpdateEvent{
 			AccountID:         agg.DestinationAccountID.String(),
 			Amount:            agg.Amount.Value,
 			BalanceUpdateType: consts.CreditBalanceUpdateType,
 		})
-	case vo.WithdrawalType: // sends one account update
+	case vo.WithdrawalType: // sends one account update event
 		messages = append(messages, account.UpdateEvent{
 			AccountID:         agg.SourceAccountID.String(),
 			Amount:            agg.Amount.Value,
 			BalanceUpdateType: consts.DebitBalanceUpdateType,
 		})
-	case vo.TransferType: // sends two account updates
+	case vo.TransferType: // sends two account updates event
 		messages = append(messages,
 			account.UpdateEvent{
 				AccountID:         agg.SourceAccountID.String(),
@@ -78,30 +94,40 @@ func (h *ProcessTransactionHandler) Process(ctx context.Context, dto dto.Process
 		// TODO: log
 		return fmt.Errorf("%s: reversal transaction is not supported", op)
 	default:
-		// TODO: log
+		h.log.Errorw("Invalid transaction type",
+			"type", agg.Type.Value,
+			"outboxID", outboxID,
+		)
 		return fmt.Errorf("%s: %w", op, exceptions.InvalidTxType)
 	}
 
-	for _, msg := range messages {
-		payload, err := h.svc.MarshalMessage(msg)
-		if err != nil {
-			// TODO: log
-			return fmt.Errorf("%s: %w", op, err)
-		}
-
-		err = h.producer.SendMessage(ctx, nil, payload)
-		if err != nil {
-			// TODO: log
-			return fmt.Errorf("%s: %w", op, err)
-		}
-	}
-
-	if err = h.dao.SetProcessed(ctx, outboxID); err != nil {
-		// TODO: log
+	payload, err := h.svc.MarshalMessage(messages)
+	if err != nil {
+		h.log.Errorw("Failed to marshal message",
+			"error", err.Error(),
+			"outboxID", outboxID,
+		)
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	// TODO: log processed successfully
+	err = h.producer.SendMessage(ctx, h.producerTopic, nil, payload)
+	if err != nil {
+		h.log.Errorw("Failed to send message",
+			"error", err.Error(),
+			"outboxID", outboxID,
+		)
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = h.dao.SetProcessed(ctx, outboxID); err != nil {
+		h.log.Errorw("Error setting new message status",
+			"error", err.Error(),
+			"outboxID", outboxID,
+		)
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	h.log.Infow("Message processed successfully", "outboxID", outboxID)
 
 	return nil
 }

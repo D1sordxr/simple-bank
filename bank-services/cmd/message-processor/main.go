@@ -2,6 +2,7 @@ package main
 
 import (
 	consumer2 "github.com/D1sordxr/packages/kafka/consumer"
+	pkgProducer "github.com/D1sordxr/packages/kafka/producer"
 	pkgLog "github.com/D1sordxr/packages/log"
 	pkgPostgres "github.com/D1sordxr/packages/postgres"
 	pkgExecutor "github.com/D1sordxr/packages/postgres/executor"
@@ -24,14 +25,13 @@ func main() {
 
 	txMsgDAO := loadPostgresProcMsg.NewDAO(executor)
 
-	//producer, err := pkgProducer.NewProducer(cfg.Producer)
-	//if err != nil {
-	//	return
-	//}
+	producer := pkgProducer.NewProducer(&cfg.Producer)
 
 	txMsgProcessorSvc := handlers.NewProcessTransactionHandler(
-		txMsgDAO,
+		log,
 		producer,
+		cfg.ProducerTopics.Transaction, // maybe needs deeper specification
+		txMsgDAO,
 		new(services.ProcessDomainSvc),
 	)
 
