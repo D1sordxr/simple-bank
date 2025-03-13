@@ -1,8 +1,6 @@
 package app
 
 import (
-	"github.com/D1sordxr/packages/kafka/consumer"
-	"github.com/D1sordxr/packages/kafka/producer"
 	"github.com/D1sordxr/packages/log"
 	"github.com/D1sordxr/packages/postgres"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/kafka"
@@ -11,13 +9,10 @@ import (
 )
 
 type Config struct {
-	App            App             `yaml:"app"`
-	Logger         log.Config      `yaml:"logger"`
-	Storage        postgres.Config `yaml:"storage"`
-	Consumer       consumer.Config `yaml:"consumer"`
-	ConsumerTopics kafka.Topics    `yaml:"consumer_topics"`
-	Producer       producer.Config `yaml:"producer"`
-	ProducerTopics kafka.Topics    `yaml:"producer_topics"`
+	App           App             `yaml:"app"`
+	Logger        log.Config      `yaml:"logger"`
+	Storage       postgres.Config `yaml:"storage"`
+	MessageBroker kafka.Config    `yaml:"message_broker"`
 }
 
 type App struct {

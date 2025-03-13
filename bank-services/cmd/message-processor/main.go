@@ -25,12 +25,12 @@ func main() {
 
 	txMsgDAO := loadPostgresProcMsg.NewDAO(executor)
 
-	producer := pkgProducer.NewProducer(&cfg.Producer)
+	producer := pkgProducer.NewProducer(&cfg.MessageBroker.Producer)
 
 	txMsgProcessorSvc := handlers.NewProcessTransactionHandler(
 		log,
 		producer,
-		cfg.ProducerTopics.Transaction, // maybe needs deeper specification
+		cfg.MessageBroker.ProducerTopics.AccountBalanceUpdate,
 		txMsgDAO,
 		new(services.ProcessDomainSvc),
 	)
@@ -38,8 +38,8 @@ func main() {
 	txMsgHandler := transaction.NewHandler(txMsgProcessorSvc)
 
 	txMsgConsumer := consumer2.NewConsumer(
-		&cfg.Consumer,
-		cfg.ConsumerTopics.Transaction,
+		&cfg.MessageBroker.Consumer,
+		cfg.MessageBroker.ConsumerTopics.TransactionCreatedEvent,
 		txMsgHandler,
 		log,
 	)

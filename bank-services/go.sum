@@ -4,6 +4,8 @@ github.com/D1sordxr/packages v0.1.1 h1:mg6Nh12fvsIZ5N/dcTLTHyVvOLp49XANCKa1F1KXV
 github.com/D1sordxr/packages v0.1.1/go.mod h1:41lUBOSjPC5/RfAGL+yJba76lQiuE4Imk6np8VpoyBg=
 github.com/D1sordxr/packages v0.2.0 h1:tCFsVfNoIOoiucvoQYpu5qXHcA/3gcAqcBLt3hHXKNA=
 github.com/D1sordxr/packages v0.2.0/go.mod h1:41lUBOSjPC5/RfAGL+yJba76lQiuE4Imk6np8VpoyBg=
+github.com/D1sordxr/packages v0.2.1 h1:rbD7LMB+HCYNWtfE7e0mlX82I9xCUTaOXVuLSmwBqLQ=
+github.com/D1sordxr/packages v0.2.1/go.mod h1:41lUBOSjPC5/RfAGL+yJba76lQiuE4Imk6np8VpoyBg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

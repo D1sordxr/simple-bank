@@ -21,7 +21,7 @@ func (c *Handler) Handle(ctx context.Context, msg kafka.Message) error {
 		Data:     msg.Value,
 	}
 
-	err := c.svc.Handle(ctx, data)
+	err := c.svc.Process(ctx, data)
 	if err != nil {
 		return err
 	}

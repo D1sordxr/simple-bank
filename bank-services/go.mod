@@ -3,7 +3,7 @@ module github.com/D1sordxr/simple-bank/bank-services
 go 1.23rc2
 
 require (
-	github.com/D1sordxr/packages v0.2.0
+	github.com/D1sordxr/packages v0.2.1
 	github.com/fatih/color v1.18.0
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0

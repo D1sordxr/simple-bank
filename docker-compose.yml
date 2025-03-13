@@ -1,5 +1,5 @@
 services:
-  bank-services:
+  bank-services: # rename to command-query-service
     build:
       context: bank-services
       dockerfile: Dockerfile
@@ -12,6 +12,21 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  message-processor:
+    build:
+      context: bank-services
+      dockerfile: /cmd/message-processor/Dockerfile
+    volumes:
+      - ./bank-services/configs/message-processor/local.yaml:/app/configs/message-processor/local.yaml
+    environment:
+      CONFIG_PATH: "/app/configs/message-processor/local.yaml"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
 
   outbox-processor:
     build:

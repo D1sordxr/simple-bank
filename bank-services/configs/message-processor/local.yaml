@@ -9,9 +9,21 @@ storage:
   database: "BankApp"
   migration: true
 
-grpc:
-  port: 44044
-  timeout: 5s
-  time: 15m
-  max_connection_idle: 5m
-  max_connection_age: 5m
+message_broker:
+  consumer:
+    brokers:
+      - "kafka:9092"
+    group_id: ""
+    commit_interval: 1s
+  consumer_topics:
+    client_created_event: "client-created-event"
+    account_created_event: "account-created-event"
+    transaction_created_event: "transaction-created-event"
+
+  producer:
+    brokers:
+      - "kafka:9092"
+    batch_size: 10
+    batch_timeout: 500ms
+  producer_topics:
+    account_balance_update: "account_balance_update"
