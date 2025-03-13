@@ -7,15 +7,15 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-type MessageProcessor struct {
+type Handler struct {
 	svc sharedInterfaces.MessageProcessor
 }
 
-func NewTransactionProcessor(svc sharedInterfaces.MessageProcessor) *MessageProcessor {
-	return &MessageProcessor{svc: svc}
+func NewHandler(svc sharedInterfaces.MessageProcessor) *Handler {
+	return &Handler{svc: svc}
 }
 
-func (c *MessageProcessor) Process(ctx context.Context, msg kafka.Message) error {
+func (c *Handler) Handle(ctx context.Context, msg kafka.Message) error {
 	data := dto.ProcessDTO{
 		OutboxID: msg.Key,
 		Data:     msg.Value,

@@ -1,7 +1,7 @@
 package main
 
 import (
-	pkgProducer "github.com/D1sordxr/packages/kafka/producer"
+	consumer2 "github.com/D1sordxr/packages/kafka/consumer"
 	pkgLog "github.com/D1sordxr/packages/log"
 	pkgPostgres "github.com/D1sordxr/packages/postgres"
 	pkgExecutor "github.com/D1sordxr/packages/postgres/executor"
@@ -15,10 +15,6 @@ import (
 )
 
 func main() {
-	// TODO: v0.1.2 packages - add yaml config support
-	// TODO: v0.1.2 packages - kafka remove topic creation with new consumer/producer
-	// TODO: v0.1.2 packages - kafka add config idempotency support
-
 	cfg := loadConfig.NewConfig()
 
 	log := pkgLog.Default() // TODO: Default() -> New() (optional)
@@ -28,26 +24,29 @@ func main() {
 
 	txMsgDAO := loadPostgresProcMsg.NewDAO(executor)
 
-	// TODO: remove error
-	// TODO: change Config -> *Config
-	producer, err := pkgProducer.NewProducer(cfg.Producer)
-	if err != nil {
-		return
-	}
+	//producer, err := pkgProducer.NewProducer(cfg.Producer)
+	//if err != nil {
+	//	return
+	//}
 
-	// TODO: packages - producer fixes
-	txMsgProcessorSvc := handlers.NewProcessTransactionHandler( // TODO: send topic as arg
+	txMsgProcessorSvc := handlers.NewProcessTransactionHandler(
 		txMsgDAO,
 		producer,
 		new(services.ProcessDomainSvc),
 	)
 
-	txMsgProcessor := transaction.NewTransactionProcessor(txMsgProcessorSvc)
-	// TODO: v0.1.2 packages - read message method for consumer (?)
-	txConsumer := consumer.NewConsumer(&cfg.Consumer, txMsgProcessor) // TODO: send topic as arg
+	txMsgHandler := transaction.NewHandler(txMsgProcessorSvc)
+
+	txMsgConsumer := consumer2.NewConsumer(
+		&cfg.Consumer,
+		cfg.ConsumerTopics.Transaction,
+		txMsgHandler,
+		log,
+	)
 
 	server := consumer.NewServer(
-		txConsumer,
+		log,
+		txMsgConsumer,
 	)
 	app := presentation.NewApp(server)
 	app.RunApp()

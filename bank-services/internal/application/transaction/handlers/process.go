@@ -30,7 +30,7 @@ func NewProcessTransactionHandler(
 	}
 }
 
-func (h *ProcessTransactionHandler) Handle(ctx context.Context, dto dto.ProcessDTO) error {
+func (h *ProcessTransactionHandler) Process(ctx context.Context, dto dto.ProcessDTO) error {
 	const op = "Services.TransactionService.ProcessTransaction"
 	// TODO: log start
 

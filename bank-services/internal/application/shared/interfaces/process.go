@@ -6,5 +6,5 @@ import (
 )
 
 type MessageProcessor interface {
-	Handle(ctx context.Context, dto dto.ProcessDTO) error
+	Process(ctx context.Context, dto dto.ProcessDTO) error
 }
