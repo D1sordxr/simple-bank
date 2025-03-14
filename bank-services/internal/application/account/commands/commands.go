@@ -6,7 +6,8 @@ type CreateAccountCommand struct {
 }
 
 type UpdateAccountCommand struct {
-	AccountID         string
-	Amount            float64
-	BalanceUpdateType string `json:"balance_update_type" binding:"required"`
+	AccountID         string  `json:"account_id" binding:"required"`
+	Amount            float64 `json:"amount" binding:"required"`
+	BalanceUpdateType string  `json:"balance_update_type" binding:"required"`
+	Status            string  `json:"status,omitempty"`
 }
