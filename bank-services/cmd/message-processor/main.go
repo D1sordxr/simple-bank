@@ -12,7 +12,6 @@ import (
 	loadPostgresProcMsg "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/dao/processed-messages"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/consumer"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/presentation/consumer/handlers/transaction"
 )
 
 func main() {
@@ -34,14 +33,18 @@ func main() {
 		txMsgDAO,
 		new(services.ProcessDomainSvc),
 	)
+	// TODO: sagaMsgProcessorSvc :=
 
-	txMsgHandler := transaction.NewHandler(txMsgProcessorSvc)
+	txMsgHandler := consumer.NewHandler(txMsgProcessorSvc)
 
 	txMsgConsumer := consumer2.NewConsumer(
 		&cfg.MessageBroker.Consumer,
 		cfg.MessageBroker.ConsumerTopics.TransactionCreatedEvent,
 		txMsgHandler,
 		log,
+	)
+	sagaMsgConsumer := consumer.NewConsumer(
+		&cfg.MessageBroker.Consumer,
 	)
 
 	server := consumer.NewServer(
