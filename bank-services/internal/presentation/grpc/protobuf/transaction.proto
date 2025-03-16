@@ -18,7 +18,19 @@ message CreateTransactionResponse {
   string eventID = 2;
 }
 
+message UpdateTransactionRequest {
+  string transactionID = 1;
+  string status = 2;
+  string failureReason = 3;
+}
+
+message UpdateTransactionResponse {
+  string transactionID = 1;
+  string eventID = 2;
+}
+
 service TransactionService {
   rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
+  rpc UpdateTransaction(UpdateTransactionRequest) returns (UpdateTransactionResponse);
 }
 

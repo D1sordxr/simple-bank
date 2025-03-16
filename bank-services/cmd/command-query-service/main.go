@@ -1,6 +1,7 @@
 package main
 
 import (
+	pkgLog "github.com/D1sordxr/packages/log"
 	loadApplicationServices "github.com/D1sordxr/simple-bank/bank-services/internal/application"
 	loadAccountService "github.com/D1sordxr/simple-bank/bank-services/internal/application/account"
 	loadAccountDeps "github.com/D1sordxr/simple-bank/bank-services/internal/application/account/dependencies"
@@ -11,6 +12,8 @@ import (
 	loadTransactionService "github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction"
 	loadTransactionDeps "github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dependencies"
 	loadTransactionHandlers "github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/handlers"
+	loadAccountDomainSvc "github.com/D1sordxr/simple-bank/bank-services/internal/domain/account/services"
+	loadTransactionDomainSvc "github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/services"
 	loadStorage "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure"
 	loadConfig "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app"
 	loadLogger "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/logger"
@@ -31,14 +34,13 @@ import (
 	loadTxGrpcService "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/handlers/transaction"
 )
 
-// TODO: UpdateCommands - add update client and account commands (executes event + outbox)
+// TODO: UpdateCommands - implement client (executes event + outbox)
 
 // TODO: Queries - add application logic for client and account, implement and use cache (projections) + DAOs
+// TODO: Move queries to another app which depends on Redis
+
 // TODO: Transaction (aggregate) - add reversal type support
 
-// TODO: Workers...
-// TODO: Outbox reader and Kafka producer service
-// TODO: Kafka consumer services to process transaction and updating client and account data
 // TODO: Redis for caching client and account data
 
 // TODO: Money - rework float64 -> decimal.Decimal from shopspring library (optional)
@@ -48,6 +50,7 @@ func main() {
 
 	slogLogger := loadSlogLogger.NewSlogLogger(cfg)
 	logger := loadLogger.NewLogger(slogLogger)
+	logV2 := pkgLog.Default()
 
 	databasePool := loadPostgresConnection.NewPool(&cfg.StorageConfig)
 	databaseExecutor := loadPosgresExecutor.NewExecutor(databasePool)
@@ -92,10 +95,16 @@ func main() {
 		storage.AccountRepository,
 	)
 	createAccountCommand := loadAccountHandlers.NewCreateAccountHandler(accountDependencies)
-	getByIDAccountQuery := loadAccountHandlers.NewGetByIDAccountHandler(accountDependencies) // TODO: getByIDAccountQuery
+	updateAccountCommand := loadAccountHandlers.NewUpdateAccountHandler(
+		logV2,
+		storage.UnitOfWork,
+		storage.EventRepository,
+		storage.OutboxRepository,
+		new(loadAccountDomainSvc.UpdateDomainSvc),
+	)
 	accountService := loadAccountService.NewAccountService(
 		createAccountCommand, // create account command implementation
-		getByIDAccountQuery,  // getByID account query implementation
+		updateAccountCommand, // update account command implementation
 	)
 
 	transactionDependencies := loadTransactionDeps.NewTransactionDependencies(
@@ -106,8 +115,15 @@ func main() {
 		storage.TransactionRepository,
 	)
 	createTransactionCommand := loadTransactionHandlers.NewCreateTransactionHandler(transactionDependencies)
+	updateTransactionCommand := loadTransactionHandlers.NewUpdateTransactionHandler(
+		logV2,
+		storage.UnitOfWork,
+		storage.EventRepository,
+		storage.OutboxRepository,
+		new(loadTransactionDomainSvc.UpdateDomainSvc))
 	transactionService := loadTransactionService.NewTransactionService(
 		createTransactionCommand, // create transaction command implementation
+		updateTransactionCommand, // update transaction command implementation
 	)
 
 	applicationServices := loadApplicationServices.NewApplicationServices(

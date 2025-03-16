@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	TransactionService_CreateTransaction_FullMethodName = "/TransactionService/CreateTransaction"
+	TransactionService_UpdateTransaction_FullMethodName = "/TransactionService/UpdateTransaction"
 )
 
 // TransactionServiceClient is the client API for TransactionService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransactionServiceClient interface {
 	CreateTransaction(ctx context.Context, in *CreateTransactionRequest, opts ...grpc.CallOption) (*CreateTransactionResponse, error)
+	UpdateTransaction(ctx context.Context, in *UpdateTransactionRequest, opts ...grpc.CallOption) (*UpdateTransactionResponse, error)
 }
 
 type transactionServiceClient struct {
@@ -47,11 +49,22 @@ func (c *transactionServiceClient) CreateTransaction(ctx context.Context, in *Cr
 	return out, nil
 }
 
+func (c *transactionServiceClient) UpdateTransaction(ctx context.Context, in *UpdateTransactionRequest, opts ...grpc.CallOption) (*UpdateTransactionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTransactionResponse)
+	err := c.cc.Invoke(ctx, TransactionService_UpdateTransaction_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TransactionServiceServer is the server API for TransactionService service.
 // All implementations must embed UnimplementedTransactionServiceServer
 // for forward compatibility.
 type TransactionServiceServer interface {
 	CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error)
+	UpdateTransaction(context.Context, *UpdateTransactionRequest) (*UpdateTransactionResponse, error)
 	mustEmbedUnimplementedTransactionServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedTransactionServiceServer struct{}
 
 func (UnimplementedTransactionServiceServer) CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTransaction not implemented")
+}
+func (UnimplementedTransactionServiceServer) UpdateTransaction(context.Context, *UpdateTransactionRequest) (*UpdateTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTransaction not implemented")
 }
 func (UnimplementedTransactionServiceServer) mustEmbedUnimplementedTransactionServiceServer() {}
 func (UnimplementedTransactionServiceServer) testEmbeddedByValue()                            {}
@@ -104,6 +120,24 @@ func _TransactionService_CreateTransaction_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TransactionService_UpdateTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).UpdateTransaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_UpdateTransaction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).UpdateTransaction(ctx, req.(*UpdateTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TransactionService_ServiceDesc is the grpc.ServiceDesc for TransactionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var TransactionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTransaction",
 			Handler:    _TransactionService_CreateTransaction_Handler,
+		},
+		{
+			MethodName: "UpdateTransaction",
+			Handler:    _TransactionService_UpdateTransaction_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

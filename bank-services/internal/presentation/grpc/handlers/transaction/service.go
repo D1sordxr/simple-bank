@@ -38,3 +38,21 @@ func (s *GrpcService) CreateTransaction(ctx context.Context, req *services.Creat
 		EventID: "nil",
 	}, nil
 }
+
+func (s *GrpcService) UpdateTransaction(ctx context.Context, req *services.UpdateTransactionRequest) (*services.UpdateTransactionResponse, error) {
+	command := commands.UpdateTransactionCommand{
+		TransactionID: req.GetTransactionID(),
+		Status:        req.GetStatus(),
+		FailureReason: req.GetFailureReason(),
+	}
+
+	response, err := s.s.UpdateTransactionCommand.Handle(ctx, command)
+	if err != nil {
+		return nil, err
+	}
+
+	return &services.UpdateTransactionResponse{
+		TransactionID: response.TransactionID,
+		EventID:       response.EventID,
+	}, nil
+}

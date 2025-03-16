@@ -34,3 +34,22 @@ func (s *GrpcService) CreateAccount(ctx context.Context, req *services.CreateAcc
 		EventID: "nil",
 	}, nil
 }
+
+func (s *GrpcService) UpdateAccount(ctx context.Context, req *services.UpdateAccountRequest) (*services.UpdateAccountResponse, error) {
+	command := commands.UpdateAccountCommand{
+		AccountID:         req.GetAccountID(),
+		Amount:            float64(req.GetAmount()),
+		BalanceUpdateType: req.GetBalanceType(),
+		Status:            req.GetStatus(),
+	}
+
+	response, err := s.s.UpdateAccountCommand.Handle(ctx, command)
+	if err != nil {
+		return nil, err
+	}
+
+	return &services.UpdateAccountResponse{
+		AccountID: response.AccountID,
+		EventID:   response.EventID,
+	}, nil
+}

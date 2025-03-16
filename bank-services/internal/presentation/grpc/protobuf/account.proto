@@ -14,7 +14,20 @@ message CreateAccountResponse {
   string eventID = 2;
 }
 
+message UpdateAccountRequest {
+  string accountID = 1;
+  float amount = 2;
+  string balanceType = 3;
+  string status = 4;
+}
+
+message UpdateAccountResponse {
+  string accountID = 1;
+  string eventID = 2;
+}
+
 service AccountService {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse);
 }
 

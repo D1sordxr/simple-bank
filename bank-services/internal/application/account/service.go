@@ -6,15 +6,15 @@ import (
 
 type Service struct {
 	interfaces.CreateAccountCommand
-	interfaces.GetByIDAccountQuery
+	interfaces.UpdateAccountCommand
 }
 
 func NewAccountService(
 	create interfaces.CreateAccountCommand,
-	getByID interfaces.GetByIDAccountQuery,
+	update interfaces.UpdateAccountCommand,
 ) *Service {
 	return &Service{
 		CreateAccountCommand: create,
-		GetByIDAccountQuery:  getByID,
+		UpdateAccountCommand: update,
 	}
 }
