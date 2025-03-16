@@ -13,7 +13,7 @@ func (CompleteTransactionDomainSvc) UnmarshalData(dto dto.ProcessDTO) (account.U
 	const op = "domain.saga.CompleteTransactionDomainSvc.UnmarshalData"
 
 	var data account.UpdateEvents
-	err := json.Unmarshal(dto.Data, &data)
+	err := json.Unmarshal(dto.Value, &data)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

@@ -3,15 +3,13 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/commands"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/dto"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/account/interfaces"
 	sharedInterfaces "github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
-	eventRepo "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
-	outboxRepo "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/outbox"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/commands"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dto"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/interfaces"
 )
 
-type UpdateAccountHandler struct {
+type UpdateTransactionHandler struct {
 	log        sharedInterfaces.Logger
 	uow        sharedInterfaces.IUnitOfWork
 	eventRepo  sharedInterfaces.EventRepo
@@ -19,14 +17,14 @@ type UpdateAccountHandler struct {
 	svc        interfaces.UpdateDomainSvc
 }
 
-func NewUpdateAccountHandler(
+func NewUpdateTransactionHandler(
 	log sharedInterfaces.Logger,
 	uow sharedInterfaces.IUnitOfWork,
-	eventRepo eventRepo.Repository,
-	outboxRepo outboxRepo.Repository,
+	eventRepo sharedInterfaces.EventRepo,
+	outboxRepo sharedInterfaces.OutboxRepo,
 	svc interfaces.UpdateDomainSvc,
-) *UpdateAccountHandler {
-	return &UpdateAccountHandler{
+) *UpdateTransactionHandler {
+	return &UpdateTransactionHandler{
 		log:        log,
 		uow:        uow,
 		eventRepo:  eventRepo,
@@ -35,17 +33,17 @@ func NewUpdateAccountHandler(
 	}
 }
 
-func (h *UpdateAccountHandler) Handle(
+func (h *UpdateTransactionHandler) Handle(
 	ctx context.Context,
-	c commands.UpdateAccountCommand,
-) (dto.UpdateDTO, error) {
-	const op = "Services.AccountService.UpdateAccount"
+	c commands.UpdateTransactionCommand) (dto.UpdateDTO, error) {
 
-	h.log.Infow("Attempting to update account...", "accountID", c.AccountID)
+	const op = "Services.TransactionService.UpdateTransaction"
+
+	h.log.Infow("Attempting to update transaction...", "transactionID", c.TransactionID)
 
 	event, err := h.svc.CreateUpdateEvent(c)
 	if err != nil {
-		h.log.Errorw("Failed to create update event", "accountID", c.AccountID)
+		h.log.Errorw("Failed to create update event", "transactionID", c.TransactionID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -59,24 +57,24 @@ func (h *UpdateAccountHandler) Handle(
 	defer h.uow.GracefulRollback(ctx, &err)
 
 	if err = h.eventRepo.SaveEvent(ctx, event); err != nil {
-		h.log.Errorw("Failed to save event to repository", "accountID", c.AccountID)
+		h.log.Errorw("Failed to save event to repository", "transactionID", c.TransactionID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = h.outboxRepo.SaveOutboxEvent(ctx, outbox); err != nil {
-		h.log.Errorw("Failed to save outbox event to repository", "accountID", c.AccountID)
+		h.log.Errorw("Failed to save outbox event to repository", "transactionID", c.TransactionID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = h.uow.Commit(ctx); err != nil {
-		h.log.Errorw("Transaction commit failed", "accountID", c.AccountID)
+		h.log.Errorw("Transaction commit failed", "transactionID", c.TransactionID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	h.log.Infow("Account update event saved successfully", "accountID", c.AccountID)
+	h.log.Infow("Account update event saved successfully", "transactionID", c.TransactionID)
 
 	return dto.UpdateDTO{
-		AccountID: c.AccountID,
-		EventID:   event.EventID.String(),
+		TransactionID: c.TransactionID,
+		EventID:       event.EventID.String(),
 	}, nil
 }

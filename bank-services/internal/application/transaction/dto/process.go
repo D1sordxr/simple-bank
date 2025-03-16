@@ -1,6 +1,6 @@
 package dto
 
 type ProcessDTO struct {
-	OutboxID []byte
-	Data     []byte
+	Key   []byte `json:"key"`
+	Value []byte `json:"value"`
 }

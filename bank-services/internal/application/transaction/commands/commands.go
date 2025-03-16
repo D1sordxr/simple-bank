@@ -6,5 +6,11 @@ type CreateTransactionCommand struct {
 	Currency             string  `json:"currency" binding:"required"`
 	Amount               float64 `json:"amount" binding:"required"`
 	Type                 string  `json:"type" binding:"required"`
-	Description          string  `json:"description"`
+	Description          string  `json:"description,omitempty"`
+}
+
+type UpdateTransactionCommand struct {
+	TransactionID string `json:"transaction_id"`
+	Status        string `json:"status"`
+	FailureReason string `json:"failure_reason,omitempty"`
 }

@@ -70,12 +70,14 @@ func (h *ProcessTransactionHandler) Process(ctx context.Context, dto dto.Process
 			AccountID:         agg.DestinationAccountID.String(),
 			Amount:            agg.Amount.Value,
 			BalanceUpdateType: consts.CreditBalanceUpdateType,
+			TransactionID:     agg.TransactionID.String(),
 		})
 	case vo.WithdrawalType: // sends one account update event
 		messages = append(messages, account.UpdateEvent{
 			AccountID:         agg.SourceAccountID.String(),
 			Amount:            agg.Amount.Value,
 			BalanceUpdateType: consts.DebitBalanceUpdateType,
+			TransactionID:     agg.TransactionID.String(),
 		})
 	case vo.TransferType: // sends two account updates event
 		messages = append(messages,
@@ -83,11 +85,13 @@ func (h *ProcessTransactionHandler) Process(ctx context.Context, dto dto.Process
 				AccountID:         agg.SourceAccountID.String(),
 				Amount:            agg.Amount.Value,
 				BalanceUpdateType: consts.DebitBalanceUpdateType,
+				TransactionID:     agg.TransactionID.String(),
 			},
 			account.UpdateEvent{
 				AccountID:         agg.DestinationAccountID.String(),
 				Amount:            agg.Amount.Value,
 				BalanceUpdateType: consts.CreditBalanceUpdateType,
+				TransactionID:     agg.TransactionID.String(),
 			},
 		)
 	case vo.ReversalType: // TODO: support in main service

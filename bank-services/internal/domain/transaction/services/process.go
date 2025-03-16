@@ -14,12 +14,12 @@ func (ProcessDomainSvc) ParseMessage(dto dto.ProcessDTO) (string, transaction.Ag
 
 	var agg transaction.Aggregate
 
-	err := json.Unmarshal(dto.Data, &agg)
+	err := json.Unmarshal(dto.Value, &agg)
 	if err != nil {
 		return "", transaction.Aggregate{}, fmt.Errorf("%s: %w: %w", op, ErrParsingMsg, err)
 	}
 
-	outboxID := string(dto.OutboxID)
+	outboxID := string(dto.Key)
 
 	return outboxID, agg, nil
 }

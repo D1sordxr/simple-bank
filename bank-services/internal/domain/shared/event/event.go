@@ -17,7 +17,7 @@ type Event struct {
 	CreatedAt     time.Time        // Creation time
 }
 
-func (e *Event) OutboxFromEvent() outbox.Outbox {
+func (e *Event) ToOutbox() outbox.Outbox {
 	status := vo2.OutboxStatus{Status: vo2.StatusPending}
 	return outbox.Outbox{
 		OutboxID:       sharedVO.NewUUID(),
