@@ -9,14 +9,17 @@ import (
 
 type CompleteTransactionDomainSvc struct{}
 
-func (CompleteTransactionDomainSvc) UnmarshalData(dto dto.ProcessDTO) (account.UpdateEvents, error) {
+func (CompleteTransactionDomainSvc) UnmarshalData(
+	dto dto.ProcessDTO,
+) (txID string, updEvents account.UpdateEvents, err error) {
 	const op = "domain.saga.CompleteTransactionDomainSvc.UnmarshalData"
 
-	var data account.UpdateEvents
-	err := json.Unmarshal(dto.Value, &data)
+	err = json.Unmarshal(dto.Value, &updEvents)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return "", nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return data, nil
+	txID = updEvents[0].TransactionID
+
+	return txID, updEvents, nil
 }

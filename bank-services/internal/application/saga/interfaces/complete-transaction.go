@@ -6,5 +6,5 @@ import (
 )
 
 type CompleteTransactionDomainSvc interface {
-	UnmarshalData(dto dto.ProcessDTO) (account.UpdateEvents, error)
+	UnmarshalData(dto dto.ProcessDTO) (txID string, updEvents account.UpdateEvents, err error)
 }

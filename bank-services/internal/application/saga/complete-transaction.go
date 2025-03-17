@@ -6,88 +6,85 @@ import (
 	"github.com/D1sordxr/simple-bank/bank-services/internal/application/saga/interfaces"
 	sharedInterfaces "github.com/D1sordxr/simple-bank/bank-services/internal/application/shared/interfaces"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/dto"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/vo"
 	pbServices "github.com/D1sordxr/simple-bank/bank-services/internal/presentation/grpc/protobuf/services"
 	"google.golang.org/grpc"
-	"log"
-	"time"
 )
 
-type CompleteTransactionProcessor struct {
+type CompleteTransactionSaga struct {
 	log               sharedInterfaces.Logger
 	svc               interfaces.CompleteTransactionDomainSvc
 	accountClient     pbServices.AccountServiceClient
-	transactionClient pbServices.AccountServiceClient
+	transactionClient pbServices.TransactionServiceClient
+	// TODO: rollbackClient pbServices.RollbackServiceClient
 }
 
 func NewCompleteTransactionProcessor(
 	accountConn *grpc.ClientConn,
 	transactionConn *grpc.ClientConn,
-) *CompleteTransactionProcessor {
-	return &CompleteTransactionProcessor{
+) *CompleteTransactionSaga {
+	return &CompleteTransactionSaga{
 		//accountClient:     pbServices.NewAccountServiceClient(accountConn),
 		//transactionClient: pbServices.NewTransactionServiceClient(transactionConn),
 	}
 }
 
-func (p *CompleteTransactionProcessor) Process(ctx context.Context, dto dto.ProcessDTO) error {
+func (s *CompleteTransactionSaga) Process(ctx context.Context, dto dto.ProcessDTO) error {
 	const op = "application.saga.CompleteTransactionProcessor.Process"
 
-	p.log.Info("Starting Saga...")
+	s.log.Info("Starting complete transaction saga...")
 
-	accountUpdates, err := p.svc.UnmarshalData(dto)
+	txID, accountUpdates, err := s.svc.UnmarshalData(dto)
 	if err != nil {
-		// TODO: log
+		s.log.Errorw("failed to unmarshal data", "error", err)
 		return fmt.Errorf("%s: %w", op, err)
 	}
+
+	var rollbackEvents = make(event.RollbackEvents, 0, len(accountUpdates)+1) // +1 for transaction update
+	defer s.rollback(rollbackEvents, &err)
+
 	for _, update := range accountUpdates {
-		request :=
+		request := &pbServices.UpdateAccountRequest{
+			AccountID:   update.AccountID,
+			Amount:      float32(update.Amount),
+			BalanceType: update.BalanceUpdateType,
+		}
+		response, err := s.accountClient.UpdateAccount(ctx, request)
+		if err != nil {
+			s.log.Errorw("failed to update account", "error", err,
+				"account_id", update.AccountID,
+				"transaction_id", txID,
+			)
+			return fmt.Errorf("%s: %w", op, err)
+		}
+		rollbackEvents = append(rollbackEvents, event.Rollback{EventID: response.EventID}) // TODO: rollback events
 	}
 
-	// Шаг 1: Обновление аккаунта
-	if err := s.updateAccount(ctx, dto.AccountID); err != nil {
-		return fmt.Errorf("failed to update account: %w", err)
+	txRequest := &pbServices.UpdateTransactionRequest{
+		TransactionID: txID,
+		Status:        vo.StatusCompleted,
+		FailureReason: "",
 	}
-
-	// Шаг 2: Обновление транзакции
-	if err := s.updateTransaction(ctx, dto.TransactionID); err != nil {
-		// Откат (компенсирующая операция)
-		log.Println("Rolling back account update...")
-		s.rollbackAccount(ctx, dto.AccountID)
-		return fmt.Errorf("failed to update transaction: %w", err)
+	txResponse, err := s.transactionClient.UpdateTransaction(ctx, txRequest)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
 	}
+	rollbackEvents = append(rollbackEvents, event.Rollback{EventID: txResponse.EventID}) // TODO: rollback events
 
-	log.Println("Saga completed successfully")
+	s.log.Info("Saga completed successfully")
+
 	return nil
 }
 
-func (s *Saga) updateAccount(ctx context.Context, accountID string) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
+func (s *CompleteTransactionSaga) rollback(events event.RollbackEvents, err *error) {
+	const op = "application.saga.CompleteTransactionSaga.Process.rollback"
 
-	_, err := s.accountClient.UpdateAccountHandler(ctx, &pb.UpdateAccountRequest{AccountId: accountID})
-	if err != nil {
-		log.Printf("Error updating account: %v", err)
-	}
-	return err
-}
+	s.log.Info("Starting rollback transaction saga...")
 
-func (s *Saga) updateTransaction(ctx context.Context, transactionID string) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
+	_ = context.Background() // or with timeout
 
-	_, err := s.transactionClient.UpdateTransactionHandler(ctx, &pb.UpdateTransactionRequest{TransactionId: transactionID})
-	if err != nil {
-		log.Printf("Error updating transaction: %v", err)
-	}
-	return err
-}
+	// TODO: rollback events handler
 
-func (s *Saga) rollbackAccount(ctx context.Context, accountID string) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	_, err := s.accountClient.RollbackAccountHandler(ctx, &pb.RollbackAccountRequest{AccountId: accountID})
-	if err != nil {
-		log.Printf("Error rolling back account: %v", err)
-	}
+	s.log.Info("Saga rollback completed successfully")
 }
