@@ -6,7 +6,7 @@ import (
 	pkgLog "github.com/D1sordxr/packages/log"
 	pkgPostgres "github.com/D1sordxr/packages/postgres"
 	pkgExecutor "github.com/D1sordxr/packages/postgres/executor"
-	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/handlers"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/processors"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/transaction/services"
 	loadConfig "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/app/config-v2"
 	loadPostgresProcMsg "github.com/D1sordxr/simple-bank/bank-services/internal/infrastructure/postgres/dao/processed-messages"
@@ -26,7 +26,7 @@ func main() {
 
 	producer := pkgProducer.NewProducer(&cfg.MessageBroker.Producer)
 
-	txMsgProcessorSvc := handlers.NewProcessTransactionHandler(
+	txMsgProcessorSvc := processors.NewProcessTransactionHandler(
 		log,
 		producer,
 		cfg.MessageBroker.ProducerTopics.AccountBalanceUpdate,

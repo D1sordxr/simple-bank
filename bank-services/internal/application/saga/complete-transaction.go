@@ -18,6 +18,7 @@ type CompleteTransactionSaga struct {
 	accountClient     pbServices.AccountServiceClient
 	transactionClient pbServices.TransactionServiceClient
 	// TODO: rollbackClient pbServices.RollbackServiceClient
+	// TODO: database sagaState DAO
 }
 
 func NewCompleteTransactionProcessor(
@@ -80,11 +81,18 @@ func (s *CompleteTransactionSaga) Process(ctx context.Context, dto dto.ProcessDT
 func (s *CompleteTransactionSaga) rollback(events event.RollbackEvents, err *error) {
 	const op = "application.saga.CompleteTransactionSaga.Process.rollback"
 
-	s.log.Info("Starting rollback transaction saga...")
+	switch *err {
+	case nil:
+		return
+	default:
+		s.log.Infow("Rolling back transaction saga...", "error", *err)
 
-	_ = context.Background() // or with timeout
+		for _, _ = range events {
+			_ = context.Background() // or with timeout
 
-	// TODO: rollback events handler
+			// TODO: rollback events handler
+		}
 
-	s.log.Info("Saga rollback completed successfully")
+		s.log.Infow("Saga rollback completed successfully", "error", *err)
+	}
 }
