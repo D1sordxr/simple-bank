@@ -30,14 +30,37 @@ func (p *ProjectionProcessor) Process(ctx context.Context, dto dto.ProcessDTO) e
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	// todo: insert into table processed_events
+	// todo: select table processed_events where event_id = event.ID
+	// todo: if exists, return nil
 
 	upd, err := p.svc.ParseUpdateEvent([]byte(event.Payload.Payload))
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	// todo: dao.getById(upd.TransactionID)
+	oldModel, err := p.dao.GetProjection(ctx, upd.TransactionID)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	oldProjection := p.svc.ConvertModelToProjection(oldModel)
+
+	newProjection, err := p.svc.UpdateProjection(oldProjection, upd)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	newModel, err := p.svc.ConvertProjectionToModel(newProjection)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = p.dao.UpdateProjection(ctx, newModel)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	// todo: insert into processed_events (event_id) values (event.ID)
 
 	return nil
 }

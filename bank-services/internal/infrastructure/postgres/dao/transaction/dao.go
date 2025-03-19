@@ -47,6 +47,48 @@ func (d *DAO) GetTransaction(ctx context.Context, id string) (model models.Trans
 
 		return models.TransactionModel{}, fmt.Errorf("%s: %w: %w", op, ErrReadingTransaction, err)
 	}
-	
+
 	return model, nil
+}
+
+func (d *DAO) GetProjection(ctx context.Context, id string) (model models.TransactionModel, err error) {
+	const op = "postgres.TransactionDAO.GetProjection"
+
+	conn := d.Executor.GetExecutor(ctx)
+
+	query := `
+		SELECT id, 
+        status,
+        failure_reason FROM transactions WHERE id = $1
+	`
+
+	err = conn.QueryRow(ctx, query, id).Scan(
+		&model.ID, &model.Status, &model.FailureReason,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.TransactionModel{}, fmt.Errorf("%s: %w: %w", op, ErrTransactionNotFound, err)
+		}
+
+		return models.TransactionModel{}, fmt.Errorf("%s: %w: %w", op, ErrReadingTransaction, err)
+	}
+
+	return model, nil
+}
+
+func (d *DAO) UpdateProjection(ctx context.Context, model models.TransactionModel) error {
+	const op = "postgres.TransactionDAO.UpdateProjection"
+
+	conn := d.Executor.GetExecutor(ctx)
+
+	query := `
+		UPDATE transactions SET status = $1, failure_reason = $2 WHERE id = $3
+	`
+
+	_, err := conn.Exec(ctx, query, model.Status, model.FailureReason, model.ID)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }
