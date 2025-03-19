@@ -43,7 +43,9 @@ func (h *UpdateAccountHandler) Handle(
 
 	h.log.Infow("Attempting to update account...", "accountID", c.AccountID)
 
-	event, err := h.svc.CreateUpdateEvent(c)
+	updEvent := h.svc.ConvertCommandToUpdEvent(c)
+
+	event, err := h.svc.CreateUpdateEvent(updEvent)
 	if err != nil {
 		h.log.Errorw("Failed to create update event", "accountID", c.AccountID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)

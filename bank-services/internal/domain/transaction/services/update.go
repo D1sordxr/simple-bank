@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/application/transaction/commands"
 	eventPkg "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event"
+	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event/transaction"
 	"github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/event/vo"
 	sharedVO "github.com/D1sordxr/simple-bank/bank-services/internal/domain/shared/shared_vo"
 	"time"
@@ -11,10 +12,10 @@ import (
 
 type UpdateDomainSvc struct{}
 
-func (UpdateDomainSvc) CreateUpdateEvent(c commands.UpdateTransactionCommand) (eventPkg.Event, error) {
+func (UpdateDomainSvc) CreateUpdateEvent(upd transaction.UpdateEvent) (eventPkg.Event, error) {
 	const op = "domain.account.UpdateDomainSvc.CreateUpdateEvent"
 
-	aggID, err := sharedVO.NewUUIDFromString(c.TransactionID)
+	aggID, err := sharedVO.NewUUIDFromString(upd.TransactionID)
 	if err != nil {
 		return eventPkg.Event{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -24,7 +25,7 @@ func (UpdateDomainSvc) CreateUpdateEvent(c commands.UpdateTransactionCommand) (e
 		return eventPkg.Event{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	payload, err := vo.NewEventPayload(c)
+	payload, err := vo.NewEventPayload(upd)
 	if err != nil {
 		return eventPkg.Event{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -39,4 +40,12 @@ func (UpdateDomainSvc) CreateUpdateEvent(c commands.UpdateTransactionCommand) (e
 	}
 
 	return event, nil
+}
+
+func (UpdateDomainSvc) ConvertCommandToUpdEvent(c commands.UpdateTransactionCommand) transaction.UpdateEvent {
+	return transaction.UpdateEvent{
+		TransactionID: c.TransactionID,
+		Status:        c.Status,
+		FailureReason: c.FailureReason,
+	}
 }

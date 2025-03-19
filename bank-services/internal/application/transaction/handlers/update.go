@@ -41,7 +41,9 @@ func (h *UpdateTransactionHandler) Handle(
 
 	h.log.Infow("Attempting to update transaction...", "transactionID", c.TransactionID)
 
-	event, err := h.svc.CreateUpdateEvent(c)
+	updEvent := h.svc.ConvertCommandToUpdEvent(c)
+
+	event, err := h.svc.CreateUpdateEvent(updEvent)
 	if err != nil {
 		h.log.Errorw("Failed to create update event", "transactionID", c.TransactionID)
 		return dto.UpdateDTO{}, fmt.Errorf("%s: %w", op, err)

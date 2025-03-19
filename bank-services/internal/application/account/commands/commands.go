@@ -10,4 +10,5 @@ type UpdateAccountCommand struct {
 	Amount            float64 `json:"amount" binding:"required"`
 	BalanceUpdateType string  `json:"balance_update_type" binding:"required"`
 	Status            string  `json:"status,omitempty"`
+	TransactionID     string  `json:"transaction_id,omitempty"`
 }

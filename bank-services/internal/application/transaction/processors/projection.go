@@ -11,6 +11,7 @@ import (
 type ProjectionProcessor struct {
 	sharedSvc sharedInterfaces.ProjectionDomainSvc
 	svc       interfaces.ProjectionDomainSvc
+	dao       interfaces.TransactionDAO
 }
 
 func NewProjectionProcessor(
