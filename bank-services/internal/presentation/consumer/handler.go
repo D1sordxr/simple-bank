@@ -17,8 +17,8 @@ func NewHandler(svc sharedInterfaces.MessageProcessor) *Handler {
 
 func (c *Handler) Handle(ctx context.Context, msg kafka.Message) error {
 	data := dto.ProcessDTO{
-		OutboxID: msg.Key,
-		Value:    msg.Value,
+		Key:   msg.Key,
+		Value: msg.Value,
 	}
 
 	err := c.svc.Process(ctx, data)
